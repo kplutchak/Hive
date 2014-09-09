@@ -1,6 +1,6 @@
-package com.main.hive;
+package com.hive.main;
 
-import com.example.hive.R;
+import com.hive.R;
 
 import android.app.Activity;
 import android.os.Bundle;
