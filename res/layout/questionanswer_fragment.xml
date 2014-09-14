@@ -2,19 +2,87 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_light" >
+    android:background="@android:color/background_light"
+    android:id="@+id/root_qa"
+    >
     
+ 
+
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="2" 
+        >"
+    
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        >
+        
+            <TextView
+            android:id="@+id/answer_one"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        android:text="Taco Bell"
+        android:layout_centerInParent="true"
+         android:textColor="@android:color/black"
+        android:layout_marginBottom="10dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+         android:visibility="gone"
+            />
+        
+        </RelativeLayout>
+        
+    <RelativeLayout
+             android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        >
+
+          <TextView
+              android:id="@+id/answer_two"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        android:text="Del Taco"
+        android:textColor="@android:color/black"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="10dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+         android:visibility="gone"
+            />
+            
+        </RelativeLayout>
+        
+    
+    </LinearLayout>
+    
+    
+     <View
+       android:layout_width="2dp"
+       android:layout_height="fill_parent"
+       
+       android:layout_centerHorizontal="true"
+       android:background="@android:color/black"/>
+    
+        
     <TextView
+        android:id="@+id/question_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/app_test"
-        android:textColor="@android:color/black"
-        android:layout_centerInParent="true"
+         android:textColor="@android:color/black"
+        android:layout_marginTop="40dp"
+        android:layout_centerHorizontal="true"
         android:textSize="20sp"
         android:textStyle="bold"
+        android:visibility="gone"
+       
         />
     
-    <RelativeLayout
+        <RelativeLayout
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
@@ -27,7 +95,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Q"
+            android:text="A"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             
@@ -35,5 +103,10 @@
             />
     
     </RelativeLayout>
+    
+    
+    
+    
+    
 
 </RelativeLayout>

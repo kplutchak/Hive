@@ -2,6 +2,10 @@
 <resources>
 
     <string name="app_name">Hive</string>
-    <string name="app_test">Question</string>
+    <string name="app_test">What should I grub on?</string>
+    
+    <color name="magenta">#DF0044</color>
+    <color name="teal">#06779C</color>
+    <color name="yellow">#FAEF00</color>
 
 </resources>
