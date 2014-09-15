@@ -55,8 +55,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	 private LayoutParams center_lp;
 	 
 	 private boolean has_been_moved = false;
-	 private int _xDelta;
-	 private int _yDelta;
+	 private float _xDelta;
+	 private float _yDelta;
 	 private MyImageView bee;
 	 private ViewGroup root_layout;
 	// TextViews
@@ -79,18 +79,26 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			super(context);
 			// TODO Auto-generated constructor stub
 		}
+		
 
 		@Override
 		protected void onAnimationEnd() {
-		    super.onAnimationEnd();
-		   	RelativeLayout.LayoutParams lfinParams = (RelativeLayout.LayoutParams) this.getLayoutParams();
-            lfinParams.leftMargin = 0;
-            lfinParams.topMargin = 0;
-            lfinParams.bottomMargin = -250;
-            lfinParams.rightMargin = -250;
-            this.setLayoutParams(lfinParams);
-        
-            this.clearAnimation();
+		   super.onAnimationEnd();
+		   
+		  
+		  
+		  
+		   
+		    this.setX(centerX - adjust);
+		    this.setY(centerY - adjust);
+		 
+		    this.clearAnimation();
+
+		   // Animation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 0.0f);
+           // animation.setDuration(1);
+           // this.startAnimation(animation);
+		    //root_layout.invalidate();
+            
 		    
 		}
 	}
@@ -140,10 +148,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(px, px);
         
-        layoutParams.leftMargin = 0;
-        layoutParams.topMargin = 0;
-        layoutParams.bottomMargin = -250;
-        layoutParams.rightMargin = -250;
+ 
         
         this.center_lp = layoutParams;
 
@@ -248,7 +253,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		this.has_been_moved = true;
 		
 		//final RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-		velocity = VelocityTracker.obtain();
+		//velocity = VelocityTracker.obtain();
 		
 		
 	     Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -257,28 +262,29 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	        int height = size.y;
 	        int width = size.x;
 		
-		int X = (int) event.getRawX();
-		int Y = (int) event.getRawY();
+		float X = event.getRawX();
+		float Y = event.getRawY();
 		
 	
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-			velocity.addMovement(event);
+			//velocity.addMovement(event);
 			
-			_xDelta = X - lParams.leftMargin;
-			_yDelta = Y - lParams.topMargin;
+			_xDelta = X - (view.getX());
+			_yDelta = Y - (view.getY());
 			break;
 		case MotionEvent.ACTION_UP:
 			
-			velocity.addMovement(event);
+			//velocity.addMovement(event);
 
 			// Toast.makeText(getActivity(), "X velocity on release: " + Float.toString(this.last_velocity), Toast.LENGTH_SHORT).show();
-			int translate_x = (int) ((centerX - adjust) - bee.getX());
-			int translate_y = (int) ((centerY - adjust) - bee.getY());
+			float translate_x = (centerX - adjust) - view.getX();
+			float translate_y = (centerY - adjust) - view.getY();
 			Animation center_bee = new TranslateAnimation(0, translate_x, 0, translate_y);
 			center_bee.setDuration(400);
 			center_bee.setFillAfter(true);
+			//center_bee.setFillBefore(true);
 			//bee.setAnimation(center_bee);
 		
 /*
@@ -313,15 +319,11 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		case MotionEvent.ACTION_MOVE:
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
 		
-			if((X < 0 || X >= width || Y < 0 || Y>= height))
-				break;
-			
-			velocity.addMovement(event);
-			layoutParams.leftMargin = X - _xDelta;
-			layoutParams.topMargin = Y - _yDelta;
-			layoutParams.rightMargin = -250;
-			layoutParams.bottomMargin = -250;
-			view.setLayoutParams(layoutParams);
+			//if((X < 0 || X >= width || Y < 0 || Y>= height))
+				//break;
+
+			view.setX(X - _xDelta);
+			view.setY(Y - _yDelta);
 			
 		
 			break;
