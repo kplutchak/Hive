@@ -1,5 +1,7 @@
 package com.hive.fragments;
 
+import network.ConnectToBackend;
+
 import com.hive.R;
 
 import android.content.Intent;
@@ -17,6 +19,9 @@ import android.view.ViewGroup;
 public class SplashFragment extends Fragment implements OnGestureListener {
 
 	private Handler handler = new Handler();
+	
+	//Constants
+	public static final long SPLASH_MIN_WAITTIME = 3000;
 	
 	public SplashFragment() {
 		super();
@@ -47,11 +52,10 @@ public class SplashFragment extends Fragment implements OnGestureListener {
                              Bundle savedInstanceState) {
         // inflate the layout
         View v = inflater.inflate(R.layout.splash_fragment, container, false);
-        
         Runnable runnable = new Runnable() {
-        	   @Override
-        	   public void run() {
-     			  // replace fragment
+       	   @Override
+       	   public void run() {
+    			  // replace fragment
  				  
  				  QuestionAnswerFragment qa_frag = new QuestionAnswerFragment();
  				  FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
@@ -64,11 +68,12 @@ public class SplashFragment extends Fragment implements OnGestureListener {
  				  // Commit the transaction
  				  transaction.commit();
  	
-        	   }
-        	};
-        	
-        
-        handler.postDelayed(runnable, 3000);	
+       	   }
+       	};
+       	
+       
+       handler.postDelayed(runnable, this.SPLASH_MIN_WAITTIME);	
+             
 
         return v;
     }
@@ -112,6 +117,11 @@ public class SplashFragment extends Fragment implements OnGestureListener {
 		return false;
 	}
 	
+	public void endSplashScreen(long delay){
+		Log.d("SplashFragment", "endSplashScreen(), with delay:" + Long.toString(delay));
+		 
+      return;
+	}
 	
 	
 
