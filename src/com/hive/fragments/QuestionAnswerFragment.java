@@ -80,19 +80,28 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			// TODO Auto-generated constructor stub
 		}
 		
-
+/*
 		@Override
 		protected void onAnimationEnd() {
 		   super.onAnimationEnd();
 		   
-		  
+		    Runnable runnable = new Runnable() {
+		     	   @Override
+		     	   public void run() {
+
+					clearAnimation();
+		   
+		     	   }
+		     	};
+
+		     handler.post(runnable);
 		  
 		  
 		   
 		    this.setX(centerX - adjust);
 		    this.setY(centerY - adjust);
 		 
-		    this.clearAnimation();
+	
 
 		   // Animation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 0.0f);
            // animation.setDuration(1);
@@ -101,6 +110,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
             
 		    
 		}
+		*/
 	}
 	
 	@Override
@@ -253,7 +263,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		this.has_been_moved = true;
 		
 		//final RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-		//velocity = VelocityTracker.obtain();
+		velocity = VelocityTracker.obtain();
 		
 		
 	     Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -269,25 +279,47 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
 			RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-			//velocity.addMovement(event);
+			velocity.addMovement(event);
 			
 			_xDelta = X - (view.getX());
 			_yDelta = Y - (view.getY());
 			break;
 		case MotionEvent.ACTION_UP:
 			
-			//velocity.addMovement(event);
+			velocity.addMovement(event);
 
-			// Toast.makeText(getActivity(), "X velocity on release: " + Float.toString(this.last_velocity), Toast.LENGTH_SHORT).show();
-			float translate_x = (centerX - adjust) - view.getX();
-			float translate_y = (centerY - adjust) - view.getY();
+			float destination_x = 0;
+			float destination_y = 0;
+			
+			 Toast.makeText(getActivity(), "X velocity on release: " + Float.toString(this.last_velocity), Toast.LENGTH_SHORT).show();
+			 if(this.last_velocity < -800 || view.getX() < (this.centerX/2))
+			 {
+				 destination_x = this.centerX/2 - this.adjust;
+				 destination_y = this.centerY;
+			 }
+			 else if(this.last_velocity > 800 || view.getX() > (3 * (this.centerX/2)))
+			 {
+				 destination_x = (3 * this.centerX/2) - this.adjust;
+				 destination_y = this.centerY;
+			 }
+			 else
+			 {
+				 destination_x = centerX - adjust;
+				 destination_y = centerY - adjust;
+			 }
+			 
+			 final float dest_x = destination_x;
+			 final float dest_y = destination_y;
+				 
+			float translate_x = (destination_x) - view.getX();
+			float translate_y = (destination_y) - view.getY();
 			Animation center_bee = new TranslateAnimation(0, translate_x, 0, translate_y);
 			center_bee.setDuration(400);
 			center_bee.setFillAfter(true);
 			//center_bee.setFillBefore(true);
 			//bee.setAnimation(center_bee);
 		
-/*
+
 			center_bee.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -296,8 +328,9 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                	//bee.setY(centerY);
-            		//bee.setX(centerX - x_adust);
+                	
+                	view.setX(dest_x);
+        		    view.setY(dest_y);
              
                 	view.clearAnimation();
                 }
@@ -307,7 +340,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
                 }
             });
-            */
+            
 			
 			view.startAnimation(center_bee);
 			
@@ -318,13 +351,17 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			break;
 		case MotionEvent.ACTION_MOVE:
 			RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-		
+			velocity.addMovement(event);
 			//if((X < 0 || X >= width || Y < 0 || Y>= height))
 				//break;
 
 			view.setX(X - _xDelta);
 			view.setY(Y - _yDelta);
 			
+			velocity.computeCurrentVelocity(1000);
+			
+			float overall_velocity = (float) Math.hypot(velocity.getXVelocity(), velocity.getYVelocity());
+			this.last_velocity = velocity.getXVelocity();
 		
 			break;
 		}
