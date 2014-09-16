@@ -56,7 +56,11 @@ public class SplashFragment extends Fragment implements OnGestureListener {
        	   @Override
        	   public void run() {
     			  // replace fragment
- 				  
+       		   	   if(getActivity() == null)
+       		   	   {
+       		   		   handler.removeCallbacks(this);
+       		   		   return;
+       		   	   }
  				  QuestionAnswerFragment qa_frag = new QuestionAnswerFragment();
  				  FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
  				  
@@ -71,7 +75,8 @@ public class SplashFragment extends Fragment implements OnGestureListener {
        	   }
        	};
        	
-       
+       if(getActivity() == null)
+    	   handler.removeCallbacks(runnable);
        handler.postDelayed(runnable, this.SPLASH_MIN_WAITTIME);	
              
 
