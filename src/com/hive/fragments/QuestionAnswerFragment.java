@@ -2,6 +2,7 @@ package com.hive.fragments;
 
 import com.hive.R;
 import com.hive.animation.SwipeDetector;
+import com.hive.helpers.Constants;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -57,8 +58,9 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	 private boolean has_been_moved = false;
 	 private float _xDelta;
 	 private float _yDelta;
-	 private MyImageView bee;
+	 private ImageView bee;
 	 private ViewGroup root_layout;
+	 private RelativeLayout create_question;
 	// TextViews
 	
 	private TextView question;
@@ -72,46 +74,6 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	}
 	
 
-	public class MyImageView extends ImageView {
-		
-
-		public MyImageView(Context context) {
-			super(context);
-			// TODO Auto-generated constructor stub
-		}
-		
-/*
-		@Override
-		protected void onAnimationEnd() {
-		   super.onAnimationEnd();
-		   
-		    Runnable runnable = new Runnable() {
-		     	   @Override
-		     	   public void run() {
-
-					clearAnimation();
-		   
-		     	   }
-		     	};
-
-		     handler.post(runnable);
-		  
-		  
-		   
-		    this.setX(centerX - adjust);
-		    this.setY(centerY - adjust);
-		 
-	
-
-		   // Animation animation = new TranslateAnimation(0.0f, 0.0f, 0.0f, 0.0f);
-           // animation.setDuration(1);
-           // this.startAnimation(animation);
-		    //root_layout.invalidate();
-            
-		    
-		}
-		*/
-	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -147,8 +109,28 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
             }
         };
         
+        create_question = (RelativeLayout) v.findViewById(R.id.create_question_button);
+        
+        create_question.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				  CreateQuestionFragment cq_frag = new CreateQuestionFragment();
+ 				  FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+ 				  
+ 				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
+ 				  
+ 				  transaction.replace(R.id.fragment_frame, cq_frag);
+ 				  transaction.addToBackStack(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+
+ 				  // Commit the transaction
+ 				  transaction.commit();
+			}
+        	
+        });
+        
     	root_layout = (ViewGroup) v.findViewById(R.id.root_qa);
-		bee = new MyImageView(getActivity());
+		bee = new ImageView(getActivity());
 		bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
 
 		DisplayMetrics metrics = new DisplayMetrics();
@@ -157,10 +139,6 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
         int px = (int) Math.ceil(30 * logicalDensity);
 		
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(px, px);
-        
- 
-        
-        this.center_lp = layoutParams;
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         final Point size = new Point();
