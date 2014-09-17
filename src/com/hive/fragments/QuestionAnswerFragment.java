@@ -92,7 +92,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		this.setRetainInstance(true);
+		//this.setRetainInstance(true);
 		
 	}
 	
