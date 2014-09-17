@@ -3,6 +3,7 @@ package com.hive.fragments;
 import com.hive.R;
 import com.hive.animation.SwipeDetector;
 import com.hive.helpers.Constants;
+import com.hive.main.MainActivity;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -91,12 +92,17 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		this.setRetainInstance(true);
 		
 	}
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+    	
+    	//if(savedInstanceState != null)
+    		//return
+    	
         // inflate the layout
     	View v = inflater.inflate(R.layout.questionanswer_fragment, container, false);
     	
@@ -115,16 +121,9 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
 			@Override
 			public void onClick(View arg0) {
-				  CreateQuestionFragment cq_frag = new CreateQuestionFragment();
- 				  FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
- 				  
- 				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
- 				  
- 				  transaction.replace(R.id.fragment_frame, cq_frag);
- 				  transaction.addToBackStack(Constants.QUESTION_ANSWER_FRAGMENT_ID);
-
- 				  // Commit the transaction
- 				  transaction.commit();
+				MainActivity ma = (MainActivity) getActivity();
+	 			if(ma.getShowingFragmentID().equals(Constants.QUESTION_ANSWER_FRAGMENT_ID))
+	 				ma.switchToFragment(Constants.CREATE_QUESTION_FRAGMENT_ID);
 			}
         	
         });

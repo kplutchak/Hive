@@ -1,15 +1,11 @@
 package com.hive.fragments;
 
 import network.ConnectToBackend;
-
-import com.hive.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.LayoutInflater;
@@ -17,10 +13,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hive.R;
+import com.hive.helpers.Constants;
+import com.hive.main.MainActivity;
+
 public class SplashFragment extends Fragment implements OnGestureListener {
 
 	private Handler handler = new Handler();
-	
+	private QuestionAnswerFragment qa_frag;
+
 	//Constants
 	public static final long SPLASH_MIN_WAITTIME = 3000;
 	
@@ -28,12 +29,12 @@ public class SplashFragment extends Fragment implements OnGestureListener {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		
 	}
 
 	@Override
@@ -46,6 +47,9 @@ public class SplashFragment extends Fragment implements OnGestureListener {
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		
+		// for config changes
+		this.setRetainInstance(true);
 	}
 	
 	
@@ -54,8 +58,6 @@ public class SplashFragment extends Fragment implements OnGestureListener {
                              Bundle savedInstanceState) {
         // inflate the layout
         View v = inflater.inflate(R.layout.splash_fragment, container, false);
-        //
-        
         Runnable runnable = new Runnable() {
        	   @Override
        	   public void run() {
@@ -65,33 +67,27 @@ public class SplashFragment extends Fragment implements OnGestureListener {
        		   		   handler.removeCallbacks(this);
        		   		   return;
        		   	   }
- 				  QuestionAnswerFragment qa_frag = new QuestionAnswerFragment();
- 				  FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
- 				  
- 				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
- 				  
- 				  transaction.replace(R.id.fragment_frame, qa_frag);
- 				  transaction.addToBackStack(null);
- 				 
- 				 
- 				// CheckinSuccessDialog dialog = new CheckinSuccessDialog();
- 				//dialog.show(getSupportFragmentManager(), null);
- 			//	FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+       		   	  if(qa_frag!=null)
+       		   	  {
+       		   		  handler.removeCallbacks(this);
+       		   		 
+       		   		  return;
+       		   	  }
+ 			MainActivity ma = (MainActivity) getActivity();
+ 			if(ma.getShowingFragmentID().equals(Constants.SPLASH_FRAGMENT_ID))
+ 			{
  				 DialogFragment newFragment = new MyDialogFragment();
- 				// transaction.add(newFragment, null);
- 				 transaction.commit();
- 				ConnectToBackend.getAllQuestions(getActivity());
- 				
- 				
- 				  // Commit the transaction
- 				 // transaction.commit();
- 	
+  				// transaction.add(newFragment, null);
+  				ConnectToBackend.getAllQuestions(getActivity());
+ 				ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+ 			}
+ 		
        	   }
        	};
        	
        if(getActivity() == null)
     	   handler.removeCallbacks(runnable);
-       handler.postDelayed(runnable, this.SPLASH_MIN_WAITTIME);	
+       handler.postDelayed(runnable, SplashFragment.SPLASH_MIN_WAITTIME);	
              
 
         return v;
