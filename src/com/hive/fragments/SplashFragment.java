@@ -7,6 +7,7 @@ import com.hive.R;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -32,6 +33,7 @@ public class SplashFragment extends Fragment implements OnGestureListener {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
+		
 	}
 
 	@Override
@@ -52,6 +54,8 @@ public class SplashFragment extends Fragment implements OnGestureListener {
                              Bundle savedInstanceState) {
         // inflate the layout
         View v = inflater.inflate(R.layout.splash_fragment, container, false);
+        //
+        
         Runnable runnable = new Runnable() {
        	   @Override
        	   public void run() {
@@ -68,9 +72,19 @@ public class SplashFragment extends Fragment implements OnGestureListener {
  				  
  				  transaction.replace(R.id.fragment_frame, qa_frag);
  				  transaction.addToBackStack(null);
-
+ 				 
+ 				 
+ 				// CheckinSuccessDialog dialog = new CheckinSuccessDialog();
+ 				//dialog.show(getSupportFragmentManager(), null);
+ 			//	FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+ 				 DialogFragment newFragment = new MyDialogFragment();
+ 				// transaction.add(newFragment, null);
+ 				 transaction.commit();
+ 				ConnectToBackend.getAllQuestions(getActivity());
+ 				
+ 				
  				  // Commit the transaction
- 				  transaction.commit();
+ 				 // transaction.commit();
  	
        	   }
        	};

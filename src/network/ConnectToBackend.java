@@ -30,17 +30,17 @@ public class ConnectToBackend {
 		Calendar c = Calendar.getInstance(); 
 		final long functionStartTime = c.get(Calendar.MILLISECOND);
 
+		final String url = "http://bhive.herokuapp.com/api/questions";
 		Ion.with(mcontext)
-		.load("http://bhive.herokuapp.com/api/questions")
-
+		.load(url)
 		.asJsonArray()
 		.setCallback(new FutureCallback<JsonArray>() {
 		   @Override
 		    public void onCompleted(Exception e, JsonArray result) {
 			   // this is called back onto the ui thread, no Activity.runOnUiThread or Handler.post necessary.
 			   
-			   
-			   Log.d("ConnectToBackend", "getAllQuestions called");
+			  
+			   Log.d("ConnectToBackend", "getAllQuestions called with url " + url);
                if (e != null) {
                    Toast.makeText(mcontext, "Error loading questions " + e.toString(), Toast.LENGTH_LONG).show();
                    Log.d("ConnectToBackend", e.toString());
