@@ -1,5 +1,7 @@
 package com.hive.fragments;
 
+import java.util.concurrent.CountDownLatch;
+
 import network.ConnectToBackend;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,8 +21,9 @@ import com.hive.main.MainActivity;
 
 public class SplashFragment extends Fragment implements OnGestureListener {
 
-	private Handler handler = new Handler();
 	private QuestionAnswerFragment qa_frag;
+	//int 
+	
 
 	//Constants
 	public static final long SPLASH_MIN_WAITTIME = 3000;
@@ -58,38 +61,12 @@ public class SplashFragment extends Fragment implements OnGestureListener {
                              Bundle savedInstanceState) {
         // inflate the layout
         View v = inflater.inflate(R.layout.splash_fragment, container, false);
-        Runnable runnable = new Runnable() {
-       	   @Override
-       	   public void run() {
-    			  // replace fragment
-       		   	   if(getActivity() == null)
-       		   	   {
-       		   		   handler.removeCallbacks(this);
-       		   		   return;
-       		   	   }
-       		   	  if(qa_frag!=null)
-       		   	  {
-       		   		  handler.removeCallbacks(this);
-       		   		 
-       		   		  return;
-       		   	  }
- 			MainActivity ma = (MainActivity) getActivity();
- 			if(ma.getShowingFragmentID().equals(Constants.SPLASH_FRAGMENT_ID))
- 			{
- 				 DialogFragment newFragment = new MyDialogFragment();
-  				// transaction.add(newFragment, null);
-  				ConnectToBackend.getAllQuestions(getActivity());
- 				ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
- 			}
- 		
-       	   }
-       	};
-       	
-       if(getActivity() == null)
-    	   handler.removeCallbacks(runnable);
-       handler.postDelayed(runnable, SplashFragment.SPLASH_MIN_WAITTIME);	
-             
-
+        if(getActivity() != null)
+        {
+	        MainActivity ma = (MainActivity) getActivity();
+	        if(!ma.wasRestarted)
+	        	ma.handler.postDelayed(ma.runnable, SplashFragment.SPLASH_MIN_WAITTIME);
+        }
         return v;
     }
 

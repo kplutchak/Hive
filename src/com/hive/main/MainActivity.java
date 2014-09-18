@@ -1,13 +1,19 @@
 package com.hive.main;
 
+import java.util.concurrent.CountDownLatch;
+
 import network.ConnectToBackend;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 
 import com.hive.R;
 import com.hive.fragments.CreateQuestionFragment;
+import com.hive.fragments.MyDialogFragment;
 import com.hive.fragments.QuestionAnswerFragment;
 import com.hive.fragments.SplashFragment;
 import com.hive.helpers.Constants;
@@ -19,16 +25,78 @@ public class MainActivity extends FragmentActivity {
 	private QuestionAnswerFragment qaFragment;
 	private CreateQuestionFragment cqFragment;
 	
+	public boolean wasRestarted = false;
+	
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		Log.d("Pause", "App stopped!");
+		super.onStop();
+	}
+
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		this.wasRestarted = true;
+		handler.post(runnable);
+		Log.d("Pause", "App restarted!");
+		super.onRestart();
+	}
+
+	//public CountDownLatch latch = new CountDownLatch(1);
+	public Handler handler = new Handler();
+	public Runnable runnable;
 	private FragmentManager fm;
 	
+	public boolean paused;
 	
 	private String showingFragmentID;
 	
+	@Override
+	protected void onPause() {
+		handler.removeCallbacks(runnable);
+		super.onPause();
+		Log.d("Pause", "App paused!");
+		this.paused = true;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.d("Pause", "App resumed!");
+		this.paused = false;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
         //ConnectToBackend.getAllQuestionsByBlocking(this);
+		
+		 runnable = new Runnable() {
+	       	   @Override
+	       	   public void run() {
+	    			  // replace fragment
+	       		   	  if(MainActivity.this.qaFragment != null)
+	       		   	  {
+	       		   		  handler.removeCallbacks(this);
+	       		   		  return;
+	       		   	  }
+	 			MainActivity ma = MainActivity.this;
+	 			if(ma.getShowingFragmentID().equals(Constants.SPLASH_FRAGMENT_ID))
+	 			{
+	 			
+	 				 DialogFragment newFragment = new MyDialogFragment();
+	  				// transaction.add(newFragment, null);
+	 				 //while()
+	  				ConnectToBackend.getAllQuestions(MainActivity.this);
+	 				ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+	 			}
+	 		
+	       	   }
+	       	};
+
+	     //  handler.postDelayed(runnable, SplashFragment.SPLASH_MIN_WAITTIME);	
 		
 		// retain fragments
 		this.fm = this.getSupportFragmentManager();
@@ -67,6 +135,7 @@ public class MainActivity extends FragmentActivity {
 	@Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("fragID", this.showingFragmentID);
+        
     }
 	
 	public String getShowingFragmentID() {
