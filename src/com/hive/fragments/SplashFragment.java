@@ -1,5 +1,6 @@
 package com.hive.fragments;
 
+import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 
 import network.ConnectToBackend;
@@ -65,7 +66,10 @@ public class SplashFragment extends Fragment implements OnGestureListener {
         {
 	        MainActivity ma = (MainActivity) getActivity();
 	        if(!ma.wasRestarted)
-	        	ma.handler.postDelayed(ma.runnable, SplashFragment.SPLASH_MIN_WAITTIME);
+	        {
+	        	ma.startTime = Calendar.getInstance().getTimeInMillis();
+	        	ma.handler.postDelayed(ma.runnable, SplashFragment.SPLASH_MIN_WAITTIME - ma.timeDiff);
+	        }
         }
         return v;
     }

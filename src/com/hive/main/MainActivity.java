@@ -1,5 +1,6 @@
 package com.hive.main;
 
+import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 
 import network.ConnectToBackend;
@@ -26,6 +27,11 @@ public class MainActivity extends FragmentActivity {
 	private CreateQuestionFragment cqFragment;
 	
 	public boolean wasRestarted = false;
+
+	public long startTime;
+	public long endTime;
+	
+	public long timeDiff;
 	
 	@Override
 	protected void onStop() {
@@ -33,7 +39,15 @@ public class MainActivity extends FragmentActivity {
 		Log.d("Pause", "App stopped!");
 		super.onStop();
 	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		Log.d("Pause", "App destroyed!");
+		super.onDestroy();
+	}
 
+	
 	@Override
 	protected void onRestart() {
 		// TODO Auto-generated method stub
@@ -54,6 +68,7 @@ public class MainActivity extends FragmentActivity {
 	
 	@Override
 	protected void onPause() {
+		this.endTime = Calendar.getInstance().getTimeInMillis();
 		handler.removeCallbacks(runnable);
 		super.onPause();
 		Log.d("Pause", "App paused!");
@@ -72,6 +87,8 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
         //ConnectToBackend.getAllQuestionsByBlocking(this);
+		
+		this.timeDiff = 0;
 		
 		 runnable = new Runnable() {
 	       	   @Override
@@ -110,6 +127,7 @@ public class MainActivity extends FragmentActivity {
 	   if(savedInstanceState != null)
 	    {
 	        this.showingFragmentID = savedInstanceState.getString("fragID");
+	        this.timeDiff = savedInstanceState.getLong("timeDiff");
 	    }
 		
 	  if (findViewById(R.id.fragment_frame) != null) {
@@ -135,7 +153,8 @@ public class MainActivity extends FragmentActivity {
 	@Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString("fragID", this.showingFragmentID);
-        
+        long timeDiff = this.endTime - this.startTime;
+        outState.putLong("timeDiff", timeDiff);
     }
 	
 	public String getShowingFragmentID() {
@@ -185,7 +204,7 @@ public class MainActivity extends FragmentActivity {
  				  // Commit the transaction
  				 
  				 // TODO: perhaps find a better method than this to prevent the savestateinstance bug
- 				  transaction.commitAllowingStateLoss();
+ 				  transaction.commit();
  	
 			}
 		}
