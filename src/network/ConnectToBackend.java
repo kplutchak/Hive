@@ -79,7 +79,8 @@ public class ConnectToBackend {
             			   String answerBody = answerJsonList.get(j).get("text").getAsString();
                 		   String questionID = answerJsonList.get(j).get("id").getAsString();
                 		   int answerVotes = answerJsonList.get(j).get("votes").getAsInt();
-                		   Answer newans = new Answer(answerBody, questionID, answerVotes);
+                		   Answer newans = new Answer(answerBody, questionID);
+                		   newans.setVotes(answerVotes);
                 		   nq.addAnswer(newans);
                 		  
             		   }
@@ -148,7 +149,8 @@ public class ConnectToBackend {
     			   String answerBody = answerJsonList.get(j).get("text").getAsString();
         		   String questionID = answerJsonList.get(j).get("id").getAsString();
         		   int answerVotes = answerJsonList.get(j).get("votes").getAsInt();
-        		   Answer newans = new Answer(answerBody, questionID, answerVotes);
+        		   Answer newans = new Answer(answerBody, questionID);
+        		   newans.setVotes(answerVotes);
         		   nq.addAnswer(newans);
         		  
     		   }
@@ -180,16 +182,26 @@ public class ConnectToBackend {
 	//ToDo : figure out how to post!
 	public static void answerQuestion(final Context mcontext, Answer providedAnswer){
 		JsonObject json = new JsonObject();
-		json.addProperty("foo", "bar");
-
+		json.addProperty("vote", "true");
+		final String url = "http://bhive.herokuapp.com/api/answers/"+providedAnswer.getQuestionID()+"/";
 		Ion.with(mcontext)
-		.load("bhive.herokuapp.com/api/questions")
+		.load("PUT", url)
 		.setJsonObjectBody(json)
 		.asJsonObject()
 		.setCallback(new FutureCallback<JsonObject>() {
 		   @Override
 		    public void onCompleted(Exception e, JsonObject result) {
-		        // do stuff with the result or error
+			   if (e != null){
+				   Log.d("ConnectToBackend", "answerquestions called with "+url+" and has error" + e.toString());
+				   if (result==null){
+					   Log.d("ConnectToBackend", "answerQuestions returns result with NULL");
+				   } 
+			   }
+			   
+			   else{
+			   Log.d("ConnectToBackend", "answerQuestion asked with url " + url + " : and result " + result.toString());
+			   }
+		        
 		    }
 		});
 	}

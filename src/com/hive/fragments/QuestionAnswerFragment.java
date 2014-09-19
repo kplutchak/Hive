@@ -1,6 +1,11 @@
 package com.hive.fragments;
 
 
+import objects.Answer;
+import objects.Question;
+import objects.User;
+import network.ConnectToBackend;
+
 import com.hive.R;
 import com.hive.animation.SwipeDetector;
 import com.hive.helpers.Constants;
@@ -108,6 +113,10 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		User u = new User("fuck");
+		Question q = new Question("1", u);
+		Answer a = new Answer("dicks ahoy", "1"); 
+		ConnectToBackend.answerQuestion(getActivity(), a);
 		 
 
     }
@@ -157,6 +166,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
 		@Override
 		public void run() {
+
 		
 			try {
 				Thread.sleep(2000);
