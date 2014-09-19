@@ -166,6 +166,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
 		@Override
 		public void run() {
+		//ConnectToBackend.postQuestion(getActivity(), q);
 
 		
 			try {

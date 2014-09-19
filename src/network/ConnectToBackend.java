@@ -206,6 +206,43 @@ public class ConnectToBackend {
 		});
 	}
 	
+	public static void postQuestion(final Context mcontext, Question mquestion){
+		JsonArray answerarray = new JsonArray();
+		JsonObject answerjson = new JsonObject();
+		answerjson.addProperty("text", "sample answer body");
+		
+		answerarray.add(answerjson);
+		answerarray.add(answerjson);
+		
+		
+		JsonObject json = new JsonObject();
+		json.addProperty("text", "question?");
+		json.add("answers", answerarray);
+		//json.addProperty("answers", "[{'text': 'answer'}]");
+		json.addProperty("user_id", 3);
+		final String url = "http://bhive.herokuapp.com/api/questions/";
+		Ion.with(mcontext)
+		.load(url)
+		.setJsonObjectBody(json)
+		.asJsonObject()
+		.setCallback(new FutureCallback<JsonObject>() {
+		   @Override
+		    public void onCompleted(Exception e, JsonObject result) {
+			   if (e != null){
+				   Log.d("ConnectToBackend", "postQuestion called with "+url+" and has error" + e.toString());
+				   if (result==null){
+					   Log.d("ConnectToBackend", "postQuestion returns result with NULL");
+				   } 
+			   }
+			   
+			   else{
+			   Log.d("ConnectToBackend", "postQuestion asked with url " + url + " : and result " + result.toString());
+			   }
+		        
+		    }
+		});
+	}
+	
 	
 	
 	
