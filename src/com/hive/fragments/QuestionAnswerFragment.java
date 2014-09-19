@@ -113,11 +113,6 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		User u = new User("fuck");
-		Question q = new Question("1", u);
-		Answer a = new Answer("dicks ahoy", "1"); 
-		ConnectToBackend.answerQuestion(getActivity(), a);
-		 
 
     }
 	

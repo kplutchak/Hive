@@ -1,38 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/background_light"
-    android:id="@+id/root_createq"
-    >
-    
-    <EditText
-        android:id="@+id/question_input"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:layout_centerInParent="true"
-        />
-        <RelativeLayout
-        android:id="@+id/back_tab"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:background="@drawable/back_rectangle"
-        
-        >
-        
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Q"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            
-            />
-    
-    </RelativeLayout>
-    
-    
-</RelativeLayout>
+	<RelativeLayout 
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/root_createq"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:background="@android:color/background_light" >
+	
+	    <RelativeLayout
+	        android:id="@+id/back_tab"
+	        android:layout_width="30dp"
+	        android:layout_height="30dp"
+	        android:layout_alignParentLeft="true"
+	        android:layout_alignParentTop="true"
+	        android:background="@drawable/back_rectangle" >
+	
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_centerInParent="true"
+	            android:text="Q"
+	            android:textColor="@android:color/white"
+	            android:textStyle="bold" />
+	    </RelativeLayout>
+	
+	    <EditText
+	        android:id="@+id/question_input"
+	        android:layout_width="200dp"
+	        android:layout_height="150dp"
+	        android:layout_below="@+id/newquestionprompt"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginTop="10dp"
+	        android:paddingTop="10dp" />
+	
+	    <TextView
+	        android:id="@+id/newquestionprompt"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentTop="true"
+	        android:layout_centerInParent="true"
+	        android:layout_marginTop="25dp"
+	        android:text="Enter Question"
+	        android:textColor="@android:color/black"
+	        android:textStyle="bold" />
+	
+	    <TextView
+	        android:id="@+id/prompt_choiceA"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/question_input"
+	        android:layout_marginTop="19dp"
+	        android:layout_toRightOf="@+id/back_tab"
+	        android:textColor="@android:color/black"
+	        android:text="Choice A" />
+	
+	    <EditText
+	        android:id="@+id/inputChoiceA"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/question_input"
+	        android:layout_alignRight="@+id/question_input"
+	        android:layout_marginTop="5dp"
+	        android:layout_below="@+id/prompt_choiceA"
+	        android:ems="5" />
+	
+	    <TextView
+	        android:id="@+id/prompt_choiceB"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/prompt_choiceA"
+	        android:layout_below="@+id/inputChoiceA"
+	        android:layout_marginTop="18dp"
+	        android:textColor="@android:color/black"
+	        android:text="Choice B" />
+	
+	    <EditText
+	        android:id="@+id/inputChoiceB"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignLeft="@+id/inputChoiceA"
+	        android:layout_alignRight="@+id/inputChoiceA"
+	        android:layout_below="@+id/prompt_choiceB"
+	        android:layout_marginTop="5dp"
+	        android:ems="10" />
+	
+	    <Button
+	        android:id="@+id/submitQuestionButton"
+	        android:layout_width="60dp"
+	        android:layout_height="35dp"
+	        android:layout_below="@+id/inputChoiceB"
+	        android:layout_centerHorizontal="true"
+	        android:layout_marginTop="30dp"
+	        android:text="Submit"
+	        android:textSize="10sp" />
+	</RelativeLayout>

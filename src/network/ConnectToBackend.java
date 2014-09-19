@@ -15,7 +15,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hive.R;
 import com.hive.fragments.SplashFragment;
+import com.hive.helpers.Constants;
 import com.hive.main.ClientData;
+import com.hive.main.MainActivity;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.ProgressCallback;
@@ -79,7 +81,7 @@ public class ConnectToBackend {
             			   String answerBody = answerJsonList.get(j).get("text").getAsString();
                 		   String questionID = answerJsonList.get(j).get("id").getAsString();
                 		   int answerVotes = answerJsonList.get(j).get("votes").getAsInt();
-                		   Answer newans = new Answer(answerBody, questionID);
+                		   Answer newans = new Answer(answerBody);
                 		   newans.setVotes(answerVotes);
                 		   nq.addAnswer(newans);
                 		  
@@ -149,7 +151,7 @@ public class ConnectToBackend {
     			   String answerBody = answerJsonList.get(j).get("text").getAsString();
         		   String questionID = answerJsonList.get(j).get("id").getAsString();
         		   int answerVotes = answerJsonList.get(j).get("votes").getAsInt();
-        		   Answer newans = new Answer(answerBody, questionID);
+        		   Answer newans = new Answer(answerBody);
         		   newans.setVotes(answerVotes);
         		   nq.addAnswer(newans);
         		  
@@ -209,17 +211,16 @@ public class ConnectToBackend {
 	public static void postQuestion(final Context mcontext, Question mquestion){
 		JsonArray answerarray = new JsonArray();
 		JsonObject answerjson = new JsonObject();
-		answerjson.addProperty("text", "sample answer body");
-		
+		JsonObject answerjson2 = new JsonObject();
+		answerjson.addProperty("text", mquestion.getChoices().get(0).getAnswerBody());
+		answerjson2.addProperty("text", mquestion.getChoices().get(1).getAnswerBody());
 		answerarray.add(answerjson);
-		answerarray.add(answerjson);
-		
+		answerarray.add(answerjson2);
 		
 		JsonObject json = new JsonObject();
-		json.addProperty("text", "question?");
+		json.addProperty("text", mquestion.getQuestionBody());
 		json.add("answers", answerarray);
-		//json.addProperty("answers", "[{'text': 'answer'}]");
-		json.addProperty("user_id", 3);
+		json.addProperty("user_id", "temp user id");
 		final String url = "http://bhive.herokuapp.com/api/questions/";
 		Ion.with(mcontext)
 		.load(url)
@@ -233,10 +234,16 @@ public class ConnectToBackend {
 				   if (result==null){
 					   Log.d("ConnectToBackend", "postQuestion returns result with NULL");
 				   } 
+				   Toast.makeText(mcontext, "Error submitting question " + e.toString(), Toast.LENGTH_LONG).show();  
 			   }
-			   
 			   else{
-			   Log.d("ConnectToBackend", "postQuestion asked with url " + url + " : and result " + result.toString());
+				   Toast.makeText(mcontext, "Sucessfully posted question", Toast.LENGTH_LONG).show();
+				   Log.d("ConnectToBackend", "postQuestion asked with url " + url + " : and result " + result.toString());
+				   
+				   //Switch to questions fragment
+					MainActivity ma = (MainActivity) mcontext;
+						if(ma.getShowingFragmentID().equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
+							ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
 			   }
 		        
 		    }

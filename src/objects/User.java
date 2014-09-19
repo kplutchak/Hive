@@ -4,8 +4,8 @@ public class User {
 	
 	private String uID;
 	
-	public User (String userID){
-		setuID(userID);
+	public User (String uID){
+		setuID(uID);
 	}
 
 	/**
@@ -21,5 +21,7 @@ public class User {
 	public void setuID(String uID) {
 		this.uID = uID;
 	}
+	
+	
 
 }

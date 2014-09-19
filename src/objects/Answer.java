@@ -7,9 +7,9 @@ public class Answer {
 	private String questionID;
 	private int votes;
 	
-	public Answer(String m_answerBody, String m_questionID){
+	public Answer(String m_answerBody){
 		setAnswerBody(m_answerBody);
-		setQuestionID(m_questionID);
+		//setQuestionID(m_questionID);
 		setVotes(0);
 	}
 
