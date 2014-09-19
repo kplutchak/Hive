@@ -1,5 +1,6 @@
 package com.hive.fragments;
 
+
 import com.hive.R;
 import com.hive.animation.SwipeDetector;
 import com.hive.helpers.Constants;
@@ -10,6 +11,11 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,10 +35,13 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -56,12 +65,18 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	 private float centerY;
 	 private LayoutParams center_lp;
 	 
+	 private int screen_height;
+	 private int screen_width;
+	 
 	 private boolean has_been_moved = false;
 	 private float _xDelta;
 	 private float _yDelta;
 	 private ImageView bee;
 	 private ViewGroup root_layout;
 	 private RelativeLayout create_question;
+
+	 
+	 private View horizontalLine;
 	// TextViews
 	
 	private TextView question;
@@ -74,6 +89,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		// TODO Auto-generated constructor stub
 	}
 	
+
 
 	
 	@Override
@@ -92,9 +108,249 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		//this.setRetainInstance(true);
-		
+		 
+
+    }
+	
+	public class Waiter implements Runnable {
+
+		String message;
+		VerticalLine vl;
+
+		public Waiter(String message) {
+			this.message = message;
+			this.vl = new VerticalLine(getActivity());
+		}
+
+		@Override
+		public void run() {
+			synchronized (message) {
+				try {
+					Log.d("Threads", "Waiter is waiting!");
+					message.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			   handler.post(new Runnable(){
+                   public void run() {
+                	   root_layout.addView(vl);
+                	   //root_layout.addView(bee);
+               }
+           });
+			   
+			   
+			Log.d("Threads", "Waiter is done waiting!");
+		}
+
 	}
+	
+	public class Notifier implements Runnable {
+
+		String message;
+		HorizontalLine hl;
+
+		public Notifier(String message) {
+			this.message = message;
+			this.hl = new HorizontalLine(getActivity());
+		}
+
+		@Override
+		public void run() {
+		
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			   handler.post(new Runnable(){
+                   public void run() {
+                	   root_layout.addView(hl);
+               }
+           });
+			
+			
+			while(!this.hl.halfwayDone)
+			{
+				// do nothing, short animation so not a big deal
+			}
+			
+			synchronized (message) {
+				Log.d("Threads", "Notifier is notifying waiting thread to wake up!");
+				message.notify();
+			}
+
+		}
+
+	}
+
+    public static class HorizontalLine extends View {
+
+        private static Paint paint;
+        private int screenW, screenH;
+        private float X, Y;
+        private Path path;
+        private float initialScreenW;
+        private float initialX, plusX;
+        private float TX;
+        private boolean translate;
+        private int flash;
+        private Context context;
+        public boolean halfwayDone;
+
+
+        public HorizontalLine (Context context) {
+            super(context);
+
+            this.context=context;
+            this.halfwayDone = false;
+
+            paint = new Paint();
+            paint.setColor(Color.BLACK);
+            paint.setStrokeWidth(4);
+            paint.setAntiAlias(true);
+           // paint.setStrokeCap(Paint.Cap.ROUND);
+            //paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStyle(Paint.Style.STROKE);
+            //paint.setShadowLayer(7, 0, 0, Color.RED);
+
+            path= new Path();
+            TX=0;
+            translate=true;
+
+            flash=0;
+
+        }
+
+        @Override
+        public void onSizeChanged (int w, int h, int oldw, int oldh) {
+            super.onSizeChanged(w, h, oldw, oldh);
+
+            screenW = w;
+            screenH = h;
+            X = 0;
+            Y = 100;
+
+            initialScreenW=screenW;
+            initialX=((screenW/2)+(screenW/4));
+            plusX=(screenW/24);
+            
+            
+
+            path.moveTo(X, Y);
+
+        }
+
+        @Override
+        public void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            //canvas.save();    
+
+            path.lineTo(X,Y);
+            //canvas.translate(-TX, 0);
+            //if(translate==true)
+            //{
+               // TX+=4;
+            //}
+
+            if(X<screenW)
+            {
+                X+=20;
+            }
+            if(X>=(screenW/2))
+            {
+            	this.halfwayDone = true;
+            }
+
+            canvas.drawPath(path, paint);
+
+
+            //canvas.restore(); 
+
+            invalidate();
+        }
+    }
+    
+    public static class VerticalLine extends View {
+
+        private static Paint paint;
+        private int screenW, screenH;
+        private float X, Y;
+        private Path path;
+        private float initialScreenW;
+        private float initialX, plusX;
+        private float TX;
+        private boolean translate;
+        private int flash;
+        private Context context;
+
+
+        public VerticalLine (Context context) {
+            super(context);
+
+            this.context=context;
+
+            paint = new Paint();
+            paint.setColor(Color.BLACK);
+            paint.setStrokeWidth(4);
+            paint.setAntiAlias(true);
+           // paint.setStrokeCap(Paint.Cap.ROUND);
+            //paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStyle(Paint.Style.STROKE);
+            //paint.setShadowLayer(7, 0, 0, Color.RED);
+
+            path= new Path();
+            TX=0;
+            translate=true;
+
+            flash=0;
+
+        }
+
+        @Override
+        public void onSizeChanged (int w, int h, int oldw, int oldh) {
+            super.onSizeChanged(w, h, oldw, oldh);
+
+            screenW = w;
+            screenH = h;
+            X = w/2;
+            Y = 100;
+
+            initialScreenW=screenW;
+            initialX=((screenW/2)+(screenW/4));
+            plusX=(screenW/24);
+
+            path.moveTo(X, Y);
+
+        }
+
+        @Override
+        public void onDraw(Canvas canvas) {
+            super.onDraw(canvas);
+
+            //canvas.save();    
+
+            path.lineTo(X,Y);
+            //canvas.translate(-TX, 0);
+            //if(translate==true)
+            //{
+               // TX+=4;
+            //}
+
+            if(Y<screenH)
+            {
+                Y+=20;
+            }
+
+            canvas.drawPath(path, paint);
+
+
+            //canvas.restore(); 
+
+            invalidate();
+        }
+    }
 	
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,10 +359,10 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     	//if(savedInstanceState != null)
     		//return
     	
+    	
         // inflate the layout
     	View v = inflater.inflate(R.layout.questionanswer_fragment, container, false);
-    	
-    	
+
  	   // Gesture detection
         gestureDetector = new GestureDetector(getActivity(), new SwipeDetector(getActivity()));
         gestureListener = new View.OnTouchListener() {
@@ -114,7 +370,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
                 return gestureDetector.onTouchEvent(event);
             }
         };
-        
+
         create_question = (RelativeLayout) v.findViewById(R.id.create_question_button);
         
         create_question.setOnClickListener(new OnClickListener() {
@@ -129,6 +385,15 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
         });
         
     	root_layout = (ViewGroup) v.findViewById(R.id.root_qa);
+    	
+    	// lines
+    	//HorizontalLine hl = new HorizontalLine(v.getContext());
+    	//root_layout.addView(hl);
+    	
+    	//VerticalLine vl = new VerticalLine(v.getContext());
+    	//root_layout.addView(vl);
+    	
+    	
 		bee = new ImageView(getActivity());
 		bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
 
@@ -142,11 +407,11 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         final Point size = new Point();
         display.getSize(size);
-        int height = size.y;
-        int width = size.x;
+        screen_height = size.y;
+        screen_width = size.x;
         
-        centerY=height/2;
-        centerX=width/2;
+        centerY=screen_height/2;
+        centerX=screen_width/2;
 
         adjust = (int) Math.ceil(15 * logicalDensity);
         
@@ -156,7 +421,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		bee.setY(centerY - adjust);
 		bee.setX(centerX - adjust);
 		
-		root_layout.addView(bee);
+		
 
     	final View fv = v;
  
@@ -169,6 +434,11 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
            }
     	});
     	
+    	int textHeight = question.getHeight();
+    	int textWidth = question.getWidth();
+    	//question.setX(centerX - (textWidth/2));
+    	//question.setY(centerY - (textHeight/2));
+    	
 		a1 = (TextView) fv.findViewById(R.id.answer_one);
 		a2 = (TextView) fv.findViewById(R.id.answer_two);
 		
@@ -180,18 +450,140 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 				final Animation animationFadeIn = AnimationUtils.loadAnimation(fv.getContext(),
 				         android.R.anim.fade_in);
 
-					question.startAnimation(animationFadeIn);
+					//question.startAnimation(animationFadeIn);
 					a1.startAnimation(animationFadeIn);
 					a2.startAnimation(animationFadeIn);
 					
-					question.setVisibility(View.VISIBLE);
+					//question.setVisibility(View.VISIBLE);
 					a1.setVisibility(View.VISIBLE);
 					a2.setVisibility(View.VISIBLE);
    
      	   }
      	};
+     	
+        Runnable runnable_fade_question = new Runnable() {
+      	   @Override
+      	   public void run() {
 
-     handler.postDelayed(runnable, 500);
+      		 AnimationSet set = new AnimationSet(true);
+      	
+      	     Animation anim = new AlphaAnimation(1.0f, 0.0f);
+      	     anim.setDuration(500);
+      	     anim.setAnimationListener(new AnimationListener() {
+
+				@Override
+				public void onAnimationEnd(Animation arg0) {
+					question.setVisibility(View.INVISIBLE);
+					
+				}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+					
+				}
+
+				@Override
+				public void onAnimationStart(Animation animation) {
+					
+				}
+      	    	 
+      	     });
+      	     set.addAnimation(anim); 
+ 					
+      	     question.startAnimation(set);
+      	     
+    
+      	   }
+      	};
+
+        Runnable runnable_move_and_fade = new Runnable() {
+       	   @Override
+       	   public void run() {
+
+       	     AnimationSet set = new AnimationSet(true);
+       	     Animation trAnimation = new TranslateAnimation(0, 0, 0, centerY + 100 - screen_height);
+       	     trAnimation.setDuration(1000);
+       	     trAnimation.setFillAfter(true);
+
+       	     set.addAnimation(trAnimation);
+       	     Animation anim = new AlphaAnimation(0.0f, 1.0f);
+       	     anim.setDuration(1000);
+       	     anim.setFillAfter(true);
+       	     set.addAnimation(anim); 
+       	     set.setFillAfter(true);
+       	     
+     	     anim.setAnimationListener(new AnimationListener() {
+
+ 				@Override
+ 				public void onAnimationEnd(Animation arg0) {
+ 					int textHeight = question.getHeight();
+ 					//question.setY(centerY-500 - textHeight);
+ 					question.setVisibility(View.VISIBLE);
+ 					//question.clearAnimation();
+ 					
+ 				}
+
+ 				@Override
+ 				public void onAnimationRepeat(Animation animation) {
+ 					
+ 				}
+
+ 				@Override
+ 				public void onAnimationStart(Animation animation) {
+ 					
+ 				}
+       	    	 
+       	     });
+
+       	     question.startAnimation(set);
+     
+       	   }
+       	};
+       	
+       /*	Runnable horizontal_line = new Runnable() {
+
+			@Override
+			public void run() {
+			 	HorizontalLine hl = new HorizontalLine(getView().getContext());
+		    	root_layout.addView(hl);
+		    	this.notify();
+				
+			}
+       		
+       	};
+       	
+      	Runnable vertical_line = new Runnable() {
+
+			@Override
+			public void run() {
+				
+		    	try {
+					this.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    	VerticalLine vl = new VerticalLine(getView().getContext());
+		    	root_layout.addView(vl);
+				
+			}
+       		
+       	};
+*/
+     handler.postDelayed(runnable_fade_question, 500);
+     handler.postDelayed(runnable_move_and_fade, 1000);
+     
+     String message = "Lines";
+
+     Waiter waiter = new Waiter(message);
+		Thread waiterThread = new Thread(waiter, "waiterThread");
+		waiterThread.start();
+
+		Notifier notifier = new Notifier(message);
+		Thread notifierThread = new Thread(notifier, "notifierThread");
+		notifierThread.start();
+
+
     	
     	return v;
     }

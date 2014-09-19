@@ -161,11 +161,6 @@ public class MainActivity extends FragmentActivity {
 		return this.showingFragmentID;
 	}
 	
-	public void unlockSplashFragment(){
-		/**
-		 * called by connectToBackend.getAllMessages() on startup. This function allows 
-		 */
-	}
 	
 	@Override
 	public void onBackPressed() {

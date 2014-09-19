@@ -22,10 +22,6 @@ import com.hive.main.MainActivity;
 
 public class SplashFragment extends Fragment implements OnGestureListener {
 
-	private QuestionAnswerFragment qa_frag;
-	//int 
-	
-
 	//Constants
 	public static final long SPLASH_MIN_WAITTIME = 3000;
 	
@@ -34,7 +30,6 @@ public class SplashFragment extends Fragment implements OnGestureListener {
 		// TODO Auto-generated constructor stub
 	}
 	
-
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
