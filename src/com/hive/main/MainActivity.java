@@ -3,6 +3,8 @@ package com.hive.main;
 import java.util.Calendar;
 import java.util.concurrent.CountDownLatch;
 
+import objects.Self;
+
 import network.ConnectToBackend;
 import android.os.Bundle;
 import android.os.Handler;
@@ -88,6 +90,7 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main);
         //ConnectToBackend.getAllQuestionsByBlocking(this);
 		
+		Self.updateSelf();
 		this.timeDiff = 0;
 		
 		 runnable = new Runnable() {
@@ -106,7 +109,6 @@ public class MainActivity extends FragmentActivity {
 	 				 DialogFragment newFragment = new MyDialogFragment();
 	  				// transaction.add(newFragment, null);
 	 				 //while()
-	  				ConnectToBackend.getAllQuestions(MainActivity.this);
 	 				ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
 	 			}
 	 		

@@ -63,7 +63,7 @@ public class CreateQuestionFragment extends Fragment {
 	        		String questionBody = questionInput.getText().toString();
 	        		String choiceAtext = choiceA.getText().toString();
 	        		String choiceBtext = choiceB.getText().toString();
-	        		Question newq = new Question(questionBody, Self.getInstance());
+	        		Question newq = new Question(questionBody, Self.getUser());
 	        		Answer ansA = new Answer(choiceAtext);
 	        		Answer ansB = new Answer(choiceBtext);
 	        		newq.addAnswer(ansA);

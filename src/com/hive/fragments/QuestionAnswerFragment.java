@@ -9,6 +9,7 @@ import network.ConnectToBackend;
 import com.hive.R;
 import com.hive.animation.SwipeDetector;
 import com.hive.helpers.Constants;
+import com.hive.main.ClientData;
 import com.hive.main.MainActivity;
 
 import android.animation.AnimatorSet;
@@ -87,6 +88,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	private TextView question;
 	private TextView a1;
 	private TextView a2;
+	
+	private Question currentQuestion;
 	
 	public QuestionAnswerFragment() {
 		super();
@@ -447,7 +450,11 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     	
 		a1 = (TextView) fv.findViewById(R.id.answer_one);
 		a2 = (TextView) fv.findViewById(R.id.answer_two);
-		
+		Question q = ClientData.getNextUnansweredQuestion(getActivity());
+		currentQuestion = q;
+		a1.setText(q.getChoices().get(0).getAnswerBody());
+		a2.setText(q.getChoices().get(1).getAnswerBody());
+		question.setText(q.getQuestionBody());
 
         Runnable runnable = new Runnable() {
      	   @Override
@@ -578,7 +585,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 */
      handler.postDelayed(runnable_fade_question, 500);
      handler.postDelayed(runnable_move_and_fade, 1000);
-     
+     handler.postDelayed(runnable_move_and_fade, 1000);
      String message = "Lines";
 
      Waiter waiter = new Waiter(message);
@@ -669,13 +676,25 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			 Toast.makeText(getActivity(), "X velocity on release: " + Float.toString(this.last_velocity), Toast.LENGTH_SHORT).show();
 			 if(this.last_velocity < -800 || view.getX() < (this.centerX/2))
 			 {
+				 //SELECTED LEFT CHOICE
 				 destination_x = this.centerX/2 - this.adjust;
 				 destination_y = this.centerY;
+				 if (currentQuestion!=null){
+					 ConnectToBackend.answerQuestion(getActivity(), currentQuestion.getChoices().get(0));
+					 MainActivity ma = (MainActivity) getActivity();
+					 ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+				 }
 			 }
 			 else if(this.last_velocity > 800 || view.getX() > (3 * (this.centerX/2)))
 			 {
+				 //SELECTED RIGHT CHOICE
 				 destination_x = (3 * this.centerX/2) - this.adjust;
 				 destination_y = this.centerY;
+				 if (currentQuestion!=null){
+					 ConnectToBackend.answerQuestion(getActivity(), currentQuestion.getChoices().get(1));
+					 MainActivity ma = (MainActivity) getActivity();
+					 ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+				 }
 			 }
 			 else
 			 {
@@ -743,4 +762,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		root_layout.invalidate();
 		return true;
 	}
+	
+	
+	
 }
