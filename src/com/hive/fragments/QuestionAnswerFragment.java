@@ -65,41 +65,36 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	 
 	 // TEST: last velocity
 	 private float last_velocity;
+	 
 	 // coordinate variables
 	 private float centerX;
 	 private float adjust;
 	 private float centerY;
-	 private LayoutParams center_lp;
-	 
 	 private int screen_height;
 	 private int screen_width;
 	 
-	 private boolean has_been_moved = false;
+	 private float question_resting_top;
+
 	 private float _xDelta;
 	 private float _yDelta;
+	 
+	 // views, images, layouts
 	 private ImageView bee;
 	 private ViewGroup root_layout;
 	 private RelativeLayout create_question;
-
+	 private TextView question;
+	 private TextView a1;
+	 private TextView a2;
 	 
-	 private View horizontalLine;
-	// TextViews
+	 private int numTimesRefreshed;
 	
-	private TextView question;
-	private TextView a1;
-	private TextView a2;
 	
 	private Question currentQuestion;
 	
 	public QuestionAnswerFragment() {
 		super();
-	
-		// TODO Auto-generated constructor stub
 	}
-	
 
-
-	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -142,7 +137,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			   handler.post(new Runnable(){
                    public void run() {
                 	   root_layout.addView(vl);
-                	   //root_layout.addView(bee);
+                	   root_layout.addView(bee);
                }
            });
 			   
@@ -168,7 +163,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
 		
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1800);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -238,7 +233,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
             screenW = w;
             screenH = h;
             X = 0;
-            Y = 100;
+            Y = 120;
 
             initialScreenW=screenW;
             initialX=((screenW/2)+(screenW/4));
@@ -324,7 +319,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
             screenW = w;
             screenH = h;
             X = w/2;
-            Y = 100;
+            Y = 120;
 
             initialScreenW=screenW;
             initialX=((screenW/2)+(screenW/4));
@@ -349,7 +344,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
             if(Y<screenH)
             {
-                Y+=20;
+                Y+=30;
             }
 
             canvas.drawPath(path, paint);
@@ -368,7 +363,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     	//if(savedInstanceState != null)
     		//return
     	
-    	
+    	this.numTimesRefreshed = 0;
         // inflate the layout
     	View v = inflater.inflate(R.layout.questionanswer_fragment, container, false);
 
@@ -450,27 +445,42 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     	
 		a1 = (TextView) fv.findViewById(R.id.answer_one);
 		a2 = (TextView) fv.findViewById(R.id.answer_two);
-		Question q = ClientData.getNextUnansweredQuestion(getActivity());
-		currentQuestion = q;
-		a1.setText(q.getChoices().get(0).getAnswerBody());
-		a2.setText(q.getChoices().get(1).getAnswerBody());
-		question.setText(q.getQuestionBody());
+		
+		currentQuestion = ClientData.getNextUnansweredQuestion(getActivity());
+		a1.setText(currentQuestion.getChoices().get(0).getAnswerBody());
+		a2.setText(currentQuestion.getChoices().get(1).getAnswerBody());
+		question.setText(currentQuestion.getQuestionBody());
 
-        Runnable runnable = new Runnable() {
+        Runnable runnable_answer_fade = new Runnable() {
      	   @Override
      	   public void run() {
 
 				final Animation animationFadeIn = AnimationUtils.loadAnimation(fv.getContext(),
 				         android.R.anim.fade_in);
+				
+				animationFadeIn.setAnimationListener(new AnimationListener() {
 
-					//question.startAnimation(animationFadeIn);
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+					}
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+					}
+					
+				});
+
 					a1.startAnimation(animationFadeIn);
 					a2.startAnimation(animationFadeIn);
 					
-					//question.setVisibility(View.VISIBLE);
 					a1.setVisibility(View.VISIBLE);
 					a2.setVisibility(View.VISIBLE);
-   
+		
      	   }
      	};
      	
@@ -514,7 +524,9 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
        	   public void run() {
 
        	     AnimationSet set = new AnimationSet(true);
-       	     Animation trAnimation = new TranslateAnimation(0, 0, 0, centerY + 100 - screen_height);
+       	     question_resting_top = centerY + 100 - screen_height;
+       	     Animation trAnimation = new TranslateAnimation(0, 0, 0, question_resting_top);
+       	     
        	     trAnimation.setDuration(1000);
        	     trAnimation.setFillAfter(true);
 
@@ -553,39 +565,13 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
        	   }
        	};
        	
-       /*	Runnable horizontal_line = new Runnable() {
-
-			@Override
-			public void run() {
-			 	HorizontalLine hl = new HorizontalLine(getView().getContext());
-		    	root_layout.addView(hl);
-		    	this.notify();
-				
-			}
-       		
-       	};
-       	
-      	Runnable vertical_line = new Runnable() {
-
-			@Override
-			public void run() {
-				
-		    	try {
-					this.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		    	VerticalLine vl = new VerticalLine(getView().getContext());
-		    	root_layout.addView(vl);
-				
-			}
-       		
-       	};
-*/
+    
      handler.postDelayed(runnable_fade_question, 500);
      handler.postDelayed(runnable_move_and_fade, 1000);
-     handler.postDelayed(runnable_move_and_fade, 1000);
+
+     handler.postDelayed(runnable_answer_fade, 2400);
+     
+
      String message = "Lines";
 
      Waiter waiter = new Waiter(message);
@@ -596,8 +582,6 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		Thread notifierThread = new Thread(notifier, "notifierThread");
 		notifierThread.start();
 
-
-    	
     	return v;
     }
     
@@ -642,7 +626,6 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 
 	@Override
 	public boolean onTouch(final View view, MotionEvent event) {
-		this.has_been_moved = true;
 		
 		//final RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
 		velocity = VelocityTracker.obtain();
@@ -676,24 +659,24 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			 Toast.makeText(getActivity(), "X velocity on release: " + Float.toString(this.last_velocity), Toast.LENGTH_SHORT).show();
 			 if(this.last_velocity < -800 || view.getX() < (this.centerX/2))
 			 {
-				 //SELECTED LEFT CHOICE
+				 // selected the left choice
 				 destination_x = this.centerX/2 - this.adjust;
 				 destination_y = this.centerY;
 				 if (currentQuestion!=null){
 					 ConnectToBackend.answerQuestion(getActivity(), currentQuestion.getChoices().get(0));
-					 MainActivity ma = (MainActivity) getActivity();
-					 ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+					// refresh the view
+					 this.refreshWithNewQuestion();
 				 }
 			 }
 			 else if(this.last_velocity > 800 || view.getX() > (3 * (this.centerX/2)))
 			 {
-				 //SELECTED RIGHT CHOICE
+				 // selected the right choice
 				 destination_x = (3 * this.centerX/2) - this.adjust;
 				 destination_y = this.centerY;
 				 if (currentQuestion!=null){
 					 ConnectToBackend.answerQuestion(getActivity(), currentQuestion.getChoices().get(1));
-					 MainActivity ma = (MainActivity) getActivity();
-					 ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+					 // refresh the view
+					 this.refreshWithNewQuestion();
 				 }
 			 }
 			 else
@@ -761,6 +744,75 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		}
 		root_layout.invalidate();
 		return true;
+	}
+	
+	private void refreshWithNewQuestion() {
+		this.currentQuestion = ClientData.getNextUnansweredQuestion(getActivity());
+		
+		
+	       Runnable runnable_view_fade = new Runnable() {
+	     	   @Override
+	     	   public void run() {
+
+					final Animation animationFadeOut = AnimationUtils.loadAnimation(getActivity(),
+					         android.R.anim.fade_out);
+					animationFadeOut.setFillAfter(true);
+					final Animation animationFadeIn = AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in);
+					
+					
+					animationFadeOut.setAnimationListener(new AnimationListener() {
+
+						@Override
+						public void onAnimationEnd(Animation arg0) {
+							// set visibilities to GONE
+							
+							//question.setVisibility(View.GONE);
+							a1.setVisibility(View.GONE);
+							a2.setVisibility(View.GONE);
+							// change the texts while hidden
+							
+							question.setText(currentQuestion.getQuestionBody());
+							a1.setText(currentQuestion.getChoices().get(0).getAnswerBody());
+							a2.setText(currentQuestion.getChoices().get(1).getAnswerBody());
+							// fade them back in
+							question.startAnimation(animationFadeIn);
+							a1.startAnimation(animationFadeIn);
+							a2.startAnimation(animationFadeIn);
+							// set visibilities to VISIBLE
+							question.setVisibility(View.VISIBLE);
+							a1.setVisibility(View.VISIBLE);
+							a2.setVisibility(View.VISIBLE);
+							
+						}
+
+						@Override
+						public void onAnimationRepeat(Animation arg0) {
+						}
+
+						@Override
+						public void onAnimationStart(Animation arg0) {
+						}
+						
+					});
+					// TODO: after first time, don't need to set anymore
+					// TODO: move bee back to middle
+					if(numTimesRefreshed == 0)
+					{
+						question.setY(question.getY() + question_resting_top);
+						numTimesRefreshed++;
+					}
+					
+					question.startAnimation(animationFadeOut);
+					a1.startAnimation(animationFadeOut);
+					a2.startAnimation(animationFadeOut);
+   
+	     	   }
+	     	};
+	     	
+	     	this.handler.post(runnable_view_fade);
+	     	
+	     	
+		
 	}
 	
 	

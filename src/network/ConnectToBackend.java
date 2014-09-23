@@ -109,7 +109,9 @@ public class ConnectToBackend {
                 		   int answerVotes = answerJsonList.get(j).get("votes").getAsInt();
                 		   Answer newans = new Answer(answerBody);
                 		   newans.setVotes(answerVotes);
+                		   newans.setQuestionID(questionID);
                 		   nq.addAnswer(newans);
+                		   
                 		  
             		   }
             		   
