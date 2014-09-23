@@ -59,7 +59,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	private Handler handler = new Handler();
 	
 	 private GestureDetector gestureDetector;
-	 private View.OnTouchListener gestureListener;
+	
+	private View.OnTouchListener gestureListener;
 	 
 	 VelocityTracker velocity;
 	 
@@ -87,7 +88,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	 private TextView a2;
 	 
 	 private int numTimesRefreshed;
-	
+	 private Thread waiterThread;
+	 private Thread notifierThread;
 	
 	private Question currentQuestion;
 	
@@ -131,7 +133,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 					Log.d("Threads", "Waiter is waiting!");
 					message.wait();
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					Log.d("Threads", "Interrupted!");
+					return;
 				}
 			}
 			   handler.post(new Runnable(){
@@ -165,7 +168,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			try {
 				Thread.sleep(1800);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Log.d("Threads", "Interrupted!");
+				return;
 			}
 			   handler.post(new Runnable(){
                    public void run() {
@@ -360,13 +364,17 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
     	
-    	//if(savedInstanceState != null)
-    		//return
-    	
+    	if(savedInstanceState != null)
+    	{
+    		
+    	}
+
     	this.numTimesRefreshed = 0;
         // inflate the layout
     	View v = inflater.inflate(R.layout.questionanswer_fragment, container, false);
 
+    	
+    	
  	   // Gesture detection
         gestureDetector = new GestureDetector(getActivity(), new SwipeDetector(getActivity()));
         gestureListener = new View.OnTouchListener() {
@@ -575,11 +583,11 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
      String message = "Lines";
 
      Waiter waiter = new Waiter(message);
-		Thread waiterThread = new Thread(waiter, "waiterThread");
+		this.waiterThread = new Thread(waiter, "waiterThread");
 		waiterThread.start();
 
 		Notifier notifier = new Notifier(message);
-		Thread notifierThread = new Thread(notifier, "notifierThread");
+		this.notifierThread = new Thread(notifier, "notifierThread");
 		notifierThread.start();
 
     	return v;
@@ -814,6 +822,22 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	     	
 		
 	}
+	
+	 @Override
+	public void onDestroy() {
+		if(this.notifierThread != null)
+		{
+			this.notifierThread.interrupt();
+			this.notifierThread = null;
+		}
+		if(this.waiterThread != null)
+		{
+			this.waiterThread.interrupt();
+			this.waiterThread = null;
+		}
+		super.onDestroy();
+	}
+
 	
 	
 	

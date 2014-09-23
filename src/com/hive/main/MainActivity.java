@@ -128,6 +128,8 @@ public class MainActivity extends FragmentActivity {
 		
 	   if(savedInstanceState != null)
 	    {
+		   if(this.qaFragment == null)
+			   this.qaFragment = (QuestionAnswerFragment) this.getSupportFragmentManager().getFragment(savedInstanceState, Constants.QUESTION_ANSWER_FRAGMENT_ID);
 	        this.showingFragmentID = savedInstanceState.getString("fragID");
 	        this.timeDiff = savedInstanceState.getLong("timeDiff");
 	    }
@@ -154,9 +156,12 @@ public class MainActivity extends FragmentActivity {
 	
 	@Override
     protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
         outState.putString("fragID", this.showingFragmentID);
         long timeDiff = this.endTime - this.startTime;
         outState.putLong("timeDiff", timeDiff);
+        if(this.qaFragment != null)
+        	this.getSupportFragmentManager().putFragment(outState, Constants.QUESTION_ANSWER_FRAGMENT_ID, this.qaFragment);
     }
 	
 	public String getShowingFragmentID() {
@@ -193,7 +198,16 @@ public class MainActivity extends FragmentActivity {
  				  
  				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
  				  
- 				  transaction.replace(R.id.fragment_frame, this.qaFragment, Constants.QUESTION_ANSWER_FRAGMENT_ID);
+ 				  if(this.showingFragmentID.equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
+ 				  {
+ 					  transaction.hide(this.cqFragment);
+ 					  transaction.show(this.qaFragment);
+ 				  }
+ 				  else
+ 				  {
+ 					  transaction.replace(R.id.fragment_frame, this.qaFragment, Constants.QUESTION_ANSWER_FRAGMENT_ID);
+ 					  
+ 				  }
 
  				  
  				 this.showingFragmentID = Constants.QUESTION_ANSWER_FRAGMENT_ID;
@@ -207,17 +221,24 @@ public class MainActivity extends FragmentActivity {
 		}
 		else if(fragment_id.equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
 		{
+			FragmentTransaction transaction = fm.beginTransaction();
 			if(this.cqFragment == null)
+			{
 				this.cqFragment = new CreateQuestionFragment();
+				transaction.add(R.id.fragment_frame, this.cqFragment, Constants.CREATE_QUESTION_FRAGMENT_ID);
+			}
 			if(this.fm != null)
 			{
 				 this.showingFragmentID = Constants.CREATE_QUESTION_FRAGMENT_ID;
-				 FragmentTransaction transaction = fm.beginTransaction();
- 				  
+				 
  				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
+ 				 transaction.hide(this.qaFragment);
  				  
- 				  transaction.replace(R.id.fragment_frame, this.cqFragment, Constants.CREATE_QUESTION_FRAGMENT_ID);
- 				  transaction.addToBackStack(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+					  //transaction.hide(this.cqFragment);
+ 				  
+ 				
+ 				  transaction.show(this.cqFragment);
+ 				 // transaction.addToBackStack(Constants.QUESTION_ANSWER_FRAGMENT_ID);
 
  				  // Commit the transaction
  				  transaction.commit();
