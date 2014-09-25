@@ -648,6 +648,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		float X = event.getRawX();
 		float Y = event.getRawY();
 		
+		
+		
 	
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_DOWN:
@@ -664,6 +666,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			float destination_x = 0;
 			float destination_y = 0;
 			
+			boolean refresh_q = false;
 			 Toast.makeText(getActivity(), "X velocity on release: " + Float.toString(this.last_velocity), Toast.LENGTH_SHORT).show();
 			 if(this.last_velocity < -800 || view.getX() < (this.centerX/2))
 			 {
@@ -673,7 +676,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 				 if (currentQuestion!=null){
 					 ConnectToBackend.answerQuestion(getActivity(), currentQuestion.getChoices().get(0));
 					// refresh the view
-					 this.refreshWithNewQuestion();
+					 refresh_q = true;
 				 }
 			 }
 			 else if(this.last_velocity > 800 || view.getX() > (3 * (this.centerX/2)))
@@ -684,7 +687,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 				 if (currentQuestion!=null){
 					 ConnectToBackend.answerQuestion(getActivity(), currentQuestion.getChoices().get(1));
 					 // refresh the view
-					 this.refreshWithNewQuestion();
+					 refresh_q = true;
 				 }
 			 }
 			 else
@@ -704,7 +707,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 			//center_bee.setFillBefore(true);
 			//bee.setAnimation(center_bee);
 		
-
+			final boolean refresh_question = refresh_q;
+			
 			center_bee.setAnimationListener(new Animation.AnimationListener() {
                 @Override
                 public void onAnimationStart(Animation animation) {
@@ -718,6 +722,8 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
         		    view.setY(dest_y);
              
                 	view.clearAnimation();
+                	if(refresh_question)
+                		refreshWithNewQuestion();
                 }
 
                 @Override
@@ -728,6 +734,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
             
 			
 			view.startAnimation(center_bee);
+		
 			
 			break;
 		case MotionEvent.ACTION_POINTER_DOWN:
@@ -816,6 +823,55 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
    
 	     	   }
 	     	};
+	     	
+	     	// center the bee
+	     	// TODO: make unclickable during animation
+	     	float destination_x = 0;
+			float destination_y = 0;
+			
+
+			 destination_x = centerX - adjust;
+			 destination_y = centerY - adjust;
+			 
+			 
+			 final float dest_x = destination_x;
+			 final float dest_y = destination_y;
+				 
+			float translate_x = (destination_x) - bee.getX();
+			float translate_y = (destination_y) - bee.getY();
+			Animation center_bee = new TranslateAnimation(0, translate_x, 0, translate_y);
+			center_bee.setDuration(400);
+			center_bee.setFillAfter(true);
+			//bee.setEnabled(false);
+			//center_bee.setFillBefore(true);
+			//bee.setAnimation(center_bee);
+		
+
+			center_bee.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                	
+                	bee.setX(dest_x);
+        		    bee.setY(dest_y);
+             
+                	bee.clearAnimation();
+                	
+                	//bee.setEnabled(true);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+            
+			
+			bee.startAnimation(center_bee);
 	     	
 	     	this.handler.post(runnable_view_fade);
 	     	
