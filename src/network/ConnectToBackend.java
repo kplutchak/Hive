@@ -93,6 +93,7 @@ public class ConnectToBackend {
             		   String questionbody = jsonlist.get(k).get("text").getAsString();
             		   String userID = jsonlist.get(k).get("user_id").getAsString();
             		   User tempuser = new User(userID);
+            		   
             		   Question nq = new Question(questionbody, tempuser);
             		 
             		   
@@ -105,16 +106,19 @@ public class ConnectToBackend {
             		   
             		   for (int j = 0; j < answerJsonList.size(); j++){
             			   String answerBody = answerJsonList.get(j).get("text").getAsString();
-                		   String questionID = answerJsonList.get(j).get("id").getAsString();
+                		   int questionIDinteger = answerJsonList.get(j).get("id").getAsInt();
+                		   String questionID = Integer.toString(questionIDinteger);
                 		   int answerVotes = answerJsonList.get(j).get("votes").getAsInt();
+                		   
                 		   Answer newans = new Answer(answerBody);
                 		   newans.setVotes(answerVotes);
                 		   newans.setQuestionID(questionID);
                 		   nq.addAnswer(newans);
-                		   
+                		//   Log.d("ConnectToBackend", "questionID = " + questionID + " and UserID = " + userID + "and answer.getQuestionID() " + newans.getQuestionID());
                 		  
             		   }
             		   
+            		  // Log.d("ConnectToBackend", "GetAllQuestions has added a new answer with questionID " + nq.getChoices().get(0).getQuestionID() + " and anwswerbody " + nq.getChoices().get(0).getAnswerBody() );
             		   ClientData.addQuestion(nq);
             	   }
             	   

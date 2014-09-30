@@ -36,7 +36,7 @@ public class ClientData {
 	
 	public static void addQuestion(Question q){
 		questions.add(q);
-		Log.d("ClientData", "addQuestion(q) added a question with text: '" + q.getQuestionBody() + "' and " + q.getChoices().size() + " answers  - question array size is now" + Integer.toString(questions.size()));
+		Log.d("ClientData", "addQuestion(q) added a question with text: '" + q.getQuestionBody() + "' and " + q.getChoices().get(0).getQuestionID() + " userID  - question array size is now" + Integer.toString(questions.size()));
 		return;
 	}
 	

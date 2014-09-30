@@ -17,7 +17,7 @@ public class Question {
 	}
 	
 	public void addAnswer(Answer ans){
-		ans.setQuestionID(questionID);
+		//ans.setQuestionID(questionID);
 		this.choices.add(ans);
 	}
 

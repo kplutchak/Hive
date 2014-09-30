@@ -1,5 +1,7 @@
 package objects;
 
+import android.util.Log;
+
 public class Answer {
 	
 	private String answerBody;
@@ -14,7 +16,7 @@ public class Answer {
 	}
 
 	public String getQuestionID() {
-		return questionID;
+		return this.questionID;
 	}
 
 	public void setQuestionID(String questionID) {
