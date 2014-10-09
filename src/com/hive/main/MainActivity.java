@@ -1,11 +1,14 @@
 package com.hive.main;
 
 import java.util.Calendar;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import objects.Self;
 
 import network.ConnectToBackend;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -247,6 +250,36 @@ public class MainActivity extends FragmentActivity {
 			
 		}
 	}
+	
+	/*
+	 *  Handle retrieval of sharedPreferences
+	 */
+
+	private SharedPreferences getGCMPreferences() {
+	    return getSharedPreferences(MainActivity.class.getSimpleName(),
+	            Context.MODE_PRIVATE);
+	}
+
+	private void initializeUserID(Context context){
+
+		final SharedPreferences prefs = getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
+		String registrationId = prefs.getString("PROPERTY_UID", "");
+		if (registrationId.isEmpty()) {
+		    	Log.i("LOUD AND CLEAR", "Registration not found.");
+		    	registrationId = UUID.randomUUID().toString();
+			}
+    	Self.getUser().setuID(registrationId);
+    	storeUID(context, Self.getUser().getuID());
+    	  Log.i("initializeUserID", "UID is " +Self.getUser().getuID());
+	}
+	private void storeUID(Context context, String regID){
+		final SharedPreferences prefs = getGCMPreferences();
+		    SharedPreferences.Editor editor = prefs.edit();
+		    editor.putString("PROPERTY_UID", Self.getUser().getuID());
+		    editor.commit();
+		  
+	}
+	
 	
 
 }
