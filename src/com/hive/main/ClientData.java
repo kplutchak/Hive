@@ -11,13 +11,14 @@ import android.util.Log;
 
 import com.google.gson.JsonArray;
 
+import objects.Answer;
 import objects.Question;
 import objects.Self;
 
 public class ClientData {
 	
 	//Singleton class to hold all data
-	private static ClientData clientdata= new ClientData();
+	private static ClientData clientdata = new ClientData();
 	private static List<Question> questions;
 	private static List<Question> answeredQuestions;
 	
@@ -31,6 +32,9 @@ public class ClientData {
 	}
 	
 	public static ClientData getInstance(){
+		if (clientdata == null){
+			clientdata = new ClientData();
+		}
 		return clientdata;
 	}
 	
@@ -49,22 +53,25 @@ public class ClientData {
 		
 			Log.d("ClientData", "getNextUnAnsweredQuestion: questions.size() = " +Integer.toString(questions.size()));
 			Question q = new Question("", Self.getUser());
+			Answer a = new Answer("developer dun goofed");
+			q.addAnswer(a);
+			q.addAnswer(a);
 			
 			if (questions.size()<1){
 				ConnectToBackend.getAllQuestions(mcontext);
-				
 			}
 			
 			Log.d("ClientData", "getNextUnAnsweredQuestion: questions.size() = " +Integer.toString(questions.size()));
 			
 			 Random rand = new Random();
-			 int randomNum = rand.nextInt(questions.size());
-			
-			 q = questions.get(randomNum);
-			 questions.remove(randomNum);
-			 answeredQuestions.add(q);
-			Log.d("ClientData", "Retrieved a question with body" + q.getQuestionBody());
-			 
+			 if (questions.size() > 0){
+				 int randomNum = rand.nextInt(questions.size());
+				 
+				 q = questions.get(randomNum);
+				 questions.remove(randomNum);
+				 answeredQuestions.add(q);
+				Log.d("ClientData", "Retrieved a question with body" + q.getQuestionBody());
+			 }
 			 return q;
 	}
 

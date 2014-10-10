@@ -5,10 +5,12 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import objects.Self;
-
+import com.hive.helpers.*;
 import network.ConnectToBackend;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
@@ -24,6 +26,7 @@ import com.hive.fragments.QuestionAnswerFragment;
 import com.hive.fragments.SplashFragment;
 import com.hive.helpers.Constants;
 
+
 public class MainActivity extends FragmentActivity {
 
 	// fragments
@@ -32,37 +35,10 @@ public class MainActivity extends FragmentActivity {
 	private CreateQuestionFragment cqFragment;
 	
 	public boolean wasRestarted = false;
-
 	public long startTime;
 	public long endTime;
-	
 	public long timeDiff;
-	
-	@Override
-	protected void onStop() {
-		// TODO Auto-generated method stub
-		Log.d("Pause", "App stopped!");
-		super.onStop();
-	}
-	
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		Log.d("Pause", "App destroyed!");
-		super.onDestroy();
-	}
 
-	
-	@Override
-	protected void onRestart() {
-		// TODO Auto-generated method stub
-		this.wasRestarted = true;
-		handler.post(runnable);
-		Log.d("Pause", "App restarted!");
-		super.onRestart();
-	}
-
-	//public CountDownLatch latch = new CountDownLatch(1);
 	public Handler handler = new Handler();
 	public Runnable runnable;
 	private FragmentManager fm;
@@ -71,31 +47,27 @@ public class MainActivity extends FragmentActivity {
 	
 	private String showingFragmentID;
 	
-	@Override
-	protected void onPause() {
-		this.endTime = Calendar.getInstance().getTimeInMillis();
-		handler.removeCallbacks(runnable);
-		super.onPause();
-		Log.d("Pause", "App paused!");
-		this.paused = true;
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		Log.d("Pause", "App resumed!");
-		this.paused = false;
-	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		/*Initialize self*/
+		initializeUserID(this);		
+		/*Create layout*/
+		
+	
+		/*Check for network*/
+		if (!isOnline()){
+			setContentView(R.layout.splash_fragment);
+			Log.d("MainActivity", "onCreate detected no network; stopping application");
+			DisplayExceptionAlertDialog error = new DisplayExceptionAlertDialog();
+			error.showAlert(this, "No Network Detected", true);	
+		}
+		
 		setContentView(R.layout.activity_main);
-        //ConnectToBackend.getAllQuestionsByBlocking(this);
-		
-		Self.updateSelf();
+			
 		this.timeDiff = 0;
-		
 		 runnable = new Runnable() {
 	       	   @Override
 	       	   public void run() {
@@ -151,8 +123,7 @@ public class MainActivity extends FragmentActivity {
         else if(this.showingFragmentID.equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
         {
         	this.switchToFragment(Constants.CREATE_QUESTION_FRAGMENT_ID);
-        }
-		
+        }		
 	  }
 
 	}
@@ -196,7 +167,6 @@ public class MainActivity extends FragmentActivity {
 				this.qaFragment = new QuestionAnswerFragment();
 			if(this.fm != null)
 			{
-				 
 				 FragmentTransaction transaction = fm.beginTransaction();
  				  
  				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
@@ -208,18 +178,13 @@ public class MainActivity extends FragmentActivity {
  				  }
  				  else
  				  {
- 					  transaction.replace(R.id.fragment_frame, this.qaFragment, Constants.QUESTION_ANSWER_FRAGMENT_ID);
- 					  
+ 					  transaction.replace(R.id.fragment_frame, this.qaFragment, Constants.QUESTION_ANSWER_FRAGMENT_ID);  
  				  }
-
- 				  
  				 this.showingFragmentID = Constants.QUESTION_ANSWER_FRAGMENT_ID;
-
  				  // Commit the transaction
  				 
  				 // TODO: perhaps find a better method than this to prevent the savestateinstance bug
  				  transaction.commit();
- 	
 			}
 		}
 		else if(fragment_id.equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
@@ -234,52 +199,102 @@ public class MainActivity extends FragmentActivity {
 			{
 				 this.showingFragmentID = Constants.CREATE_QUESTION_FRAGMENT_ID;
 				 
- 				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
+ 				 transaction.setCustomAnimations(0, android.R.anim.fade_out);
  				 transaction.hide(this.qaFragment);
  				  
 					  //transaction.hide(this.cqFragment);
- 				  
- 				
  				  transaction.show(this.cqFragment);
  				 // transaction.addToBackStack(Constants.QUESTION_ANSWER_FRAGMENT_ID);
 
  				  // Commit the transaction
  				  transaction.commit();
- 	
-			}
-			
+			}	
 		}
 	}
 	
-	/*
-	 *  Handle retrieval of sharedPreferences
-	 */
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		Log.d("Pause", "App stopped!");
+		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		DisplayExceptionAlertDialog.killDialog();
+		Log.d("Pause", "App destroyed!");
+		super.onDestroy();
+	}
 
+	
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		this.wasRestarted = true;
+		handler.post(runnable);
+		Log.d("Pause", "App restarted!");
+		super.onRestart();
+	}
+
+	@Override
+	protected void onPause() {
+		this.endTime = Calendar.getInstance().getTimeInMillis();
+		handler.removeCallbacks(runnable);
+		super.onPause();
+		Log.d("Pause", "App paused!");
+		this.paused = true;
+	}
+
+	@Override
+	protected void onResume() {
+		/*Check for network*/
+		if (!isOnline()){
+			Log.d("MainActivity", "onCreate detected no network; stopping application");
+			DisplayExceptionAlertDialog error = new DisplayExceptionAlertDialog();
+			error.showAlert(this, "No Network Detected", true);	
+		}
+		
+		super.onResume();
+		Log.d("Pause", "App resumed!");
+		this.paused = false;
+	}
+
+	
+	/*  Handle retrieval of sharedPreferences */
 	private SharedPreferences getGCMPreferences() {
 	    return getSharedPreferences(MainActivity.class.getSimpleName(),
 	            Context.MODE_PRIVATE);
 	}
-
+	
 	private void initializeUserID(Context context){
-
 		final SharedPreferences prefs = getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
 		String registrationId = prefs.getString("PROPERTY_UID", "");
 		if (registrationId.isEmpty()) {
-		    	Log.i("LOUD AND CLEAR", "Registration not found.");
+		    	Log.d("initializeUserID", "Registration not found.");
 		    	registrationId = UUID.randomUUID().toString();
 			}
     	Self.getUser().setuID(registrationId);
     	storeUID(context, Self.getUser().getuID());
-    	  Log.i("initializeUserID", "UID is " +Self.getUser().getuID());
+    	  Log.d("initializeUserID", "UID is " +Self.getUser().getuID());
 	}
+	
 	private void storeUID(Context context, String regID){
 		final SharedPreferences prefs = getGCMPreferences();
 		    SharedPreferences.Editor editor = prefs.edit();
 		    editor.putString("PROPERTY_UID", Self.getUser().getuID());
-		    editor.commit();
-		  
+		    editor.commit();  
 	}
 	
+	/*Check for network*/
+    public boolean isOnline() {
+	    ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+	    if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+	        return true;
+	    }
+	    return false;
+	}
 	
 
 }

@@ -6,11 +6,10 @@ public class Self {
 	/**
 	 * @return the myuser
 	 */
-	public Self(){
-		updateSelf();
-	}
-	
 	public static User getUser() {
+		if (user==null){
+			user = new User("NullUID");
+		}
 		return user;
 	}
 
@@ -21,12 +20,13 @@ public class Self {
 		Self.user = myuser;
 	}
 	
-	public static void updateSelf(){
+	public static void updateSelf(String UID){
 		//Check in saved preferences for an ID
 		//	else generate an ID
-		String temporaryID = "66";
-		User updated = new User(temporaryID);
-		Self.user = updated;
+		if (user==null){
+			user = new User("NullUID");
+		}
+		Self.user.setuID(UID);
 	}
 
 }

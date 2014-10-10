@@ -7,7 +7,6 @@ public class Question {
 	
 	private String questionBody;
 	private List<Answer> choices;
-	private String questionID;
 	private User asker;
 	
 	public Question(String qbody, User asker){
