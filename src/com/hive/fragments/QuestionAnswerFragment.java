@@ -49,6 +49,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -408,7 +409,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     	
 		bee = new ImageView(getActivity());
 		bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
-
+		
 		DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         float logicalDensity = metrics.density;
@@ -655,14 +656,16 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		case MotionEvent.ACTION_DOWN:
 			RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
 			velocity.addMovement(event);
-			
+			bee.setImageDrawable(getResources().getDrawable(R.drawable.ring_chooser));
 			_xDelta = X - (view.getX());
 			_yDelta = Y - (view.getY());
+			
+			
 			break;
 		case MotionEvent.ACTION_UP:
 			
 			velocity.addMovement(event);
-
+			bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
 			float destination_x = 0;
 			float destination_y = 0;
 			
