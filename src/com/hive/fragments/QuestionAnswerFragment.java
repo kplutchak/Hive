@@ -94,6 +94,10 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 	
 	private Question currentQuestion;
 	
+	//Constants
+	public final int PUCKSIZE = 60;
+	
+	
 	public QuestionAnswerFragment() {
 		super();
 	}
@@ -408,13 +412,13 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
     	
     	
 		bee = new ImageView(getActivity());
-		bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
+		bee.setImageDrawable(getResources().getDrawable(R.drawable.ring_chooser));
 		
 		DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         float logicalDensity = metrics.density;
-        int px = (int) Math.ceil(30 * logicalDensity);
-		
+        int px = (int) Math.ceil(PUCKSIZE * logicalDensity);
+
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(px, px);
 
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -426,7 +430,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
         centerY=screen_height/2;
         centerX=screen_width/2;
 
-        adjust = (int) Math.ceil(15 * logicalDensity);
+        adjust = (int) Math.ceil((PUCKSIZE/2) * logicalDensity);
         
 		bee.setLayoutParams(layoutParams);
 		bee.setOnTouchListener(this);
@@ -656,7 +660,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		case MotionEvent.ACTION_DOWN:
 			RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
 			velocity.addMovement(event);
-			bee.setImageDrawable(getResources().getDrawable(R.drawable.ring_chooser));
+			bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
 			_xDelta = X - (view.getX());
 			_yDelta = Y - (view.getY());
 			
@@ -665,7 +669,7 @@ public class QuestionAnswerFragment extends Fragment implements OnGestureListene
 		case MotionEvent.ACTION_UP:
 			
 			velocity.addMovement(event);
-			bee.setImageDrawable(getResources().getDrawable(R.drawable.circle_chooser));
+			bee.setImageDrawable(getResources().getDrawable(R.drawable.ring_chooser));
 			float destination_x = 0;
 			float destination_y = 0;
 			
