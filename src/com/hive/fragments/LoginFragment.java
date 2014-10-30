@@ -1,7 +1,7 @@
 package com.hive.fragments;
 
-
 import com.hive.R;
+import com.hive.helpers.Constants;
 import com.hive.main.MainActivity;
 
 import android.app.Dialog;
@@ -18,57 +18,36 @@ import android.widget.TextView;
 
 public class LoginFragment extends Fragment {
 
-public static boolean dialogOpened= false;
+	public static boolean dialogOpened = false;
 
-EditText mEdit;
-Button positive;
-Button negative;
-Dialog loginDialog;
+	EditText mEdit;
+	Button positive;
+	Button submitButtom;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, 
-	        ViewGroup container, Bundle savedInstanceState) {
-	    View view = inflater.inflate(R.layout.login_splash2, 
-	            container, false);
-	    
-	    Button submitButton = (Button) view.findViewById(R.id.guestButton);
-	    mEdit =  (EditText) loginDialog.findViewById(R.id.username);
-	    
-	    submitButton.setOnClickListener(new View.OnClickListener() {
-	          public void onClick(View v) {
-	        	  mEdit =  (EditText) loginDialog.findViewById(R.id.username);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.login_splash, container, false);
+		final MainActivity mactivity = (MainActivity) getActivity();
 
-   			   	MainActivity mactivity = (MainActivity) getActivity();
-   			   	mEdit.setText(mactivity.retrieveSavedGuestName(), TextView.BufferType.EDITABLE);
-   			   
-	        	  positive.setOnClickListener(new View.OnClickListener(){
-	        		  
-	        		  public void onClick(View v) {
+		Button submitButton = (Button) view.findViewById(R.id.guestButton);
+		mEdit = (EditText) view.findViewById(R.id.namebar);
+		mEdit.setText(mactivity.retrieveSavedGuestName(),
+				TextView.BufferType.EDITABLE);
 
-	                	   String username = mEdit.getText().toString().trim();
-	                	   Log.d("username handling in edittext", "EditText in logindialog accepted the username " + username);
-	                	   MainActivity mactivity = (MainActivity) getActivity();
-	                	   
-	                	   mactivity.handleNewGuest(username);
-	                	   loginDialog.dismiss();
-	                	   mactivity.showFragment(MainActivity.MAIN, false);
-	        		  	}
-			          }
-			      );
-	        	  
-	        	  negative.setOnClickListener(new View.OnClickListener(){
-	        		   public void onClick(View v) {
-	                	   LoginFragment.dialogOpened = false;
-	                       loginDialog.dismiss();
-	                   }
-			          }
-			      );
-	        	  loginDialog.show();
-	          }
-	          
-	          
-	     } );
-	    return view; 
+		submitButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+
+				String username = mEdit.getText().toString().trim();
+				Log.d("username handling in edittext",
+						"EditText in logindialog accepted the username "
+								+ username);
+
+				mactivity.handleNewGuest(username);
+				mactivity.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+
+			}
+		});
+		return view;
 	}
-
 }

@@ -5,6 +5,8 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 
 import objects.Self;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.hive.helpers.*;
 import network.ConnectToBackend;
 import android.content.Context;
@@ -21,6 +23,7 @@ import android.util.Log;
 
 import com.hive.R;
 import com.hive.fragments.CreateQuestionFragment;
+import com.hive.fragments.LoginFragment;
 import com.hive.fragments.MyDialogFragment;
 import com.hive.fragments.QuestionAnswerFragment;
 import com.hive.fragments.SplashFragment;
@@ -33,6 +36,7 @@ public class MainActivity extends FragmentActivity {
 	private SplashFragment splashFragment;
 	private QuestionAnswerFragment qaFragment;
 	private CreateQuestionFragment cqFragment;
+	private LoginFragment loginFragment;
 	
 	public boolean wasRestarted = false;
 	public long startTime;
@@ -80,11 +84,11 @@ public class MainActivity extends FragmentActivity {
 	 			MainActivity ma = MainActivity.this;
 	 			if(ma.getShowingFragmentID().equals(Constants.SPLASH_FRAGMENT_ID))
 	 			{
-	 			
 	 				 DialogFragment newFragment = new MyDialogFragment();
 	  				// transaction.add(newFragment, null);
 	 				 //while()
-	 				ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+	 				//ma.switchToFragment(Constants.QUESTION_ANSWER_FRAGMENT_ID);
+	 				ma.switchToFragment(Constants.LOGIN_FRAGMENT_ID);
 	 			}
 	 		
 	       	   }
@@ -97,7 +101,7 @@ public class MainActivity extends FragmentActivity {
 		splashFragment = (SplashFragment) fm.findFragmentByTag(Constants.SPLASH_FRAGMENT_ID);
 		qaFragment = (QuestionAnswerFragment) fm.findFragmentByTag(Constants.QUESTION_ANSWER_FRAGMENT_ID);
 		cqFragment = (CreateQuestionFragment) fm.findFragmentByTag(Constants.CREATE_QUESTION_FRAGMENT_ID);
-		
+		loginFragment = (LoginFragment) fm.findFragmentByTag(Constants.LOGIN_FRAGMENT_ID);
 		// by default, we should be showing the splash fragment
 		this.showingFragmentID = Constants.SPLASH_FRAGMENT_ID;
 		
@@ -123,7 +127,11 @@ public class MainActivity extends FragmentActivity {
         else if(this.showingFragmentID.equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
         {
         	this.switchToFragment(Constants.CREATE_QUESTION_FRAGMENT_ID);
-        }		
+        }
+        else if(this.showingFragmentID.equals(Constants.LOGIN_FRAGMENT_ID))
+        {
+        	
+        }
 	  }
 
 	}
@@ -175,6 +183,7 @@ public class MainActivity extends FragmentActivity {
  				  {
  					  transaction.hide(this.cqFragment);
  					  transaction.show(this.qaFragment);
+ 					  
  				  }
  				  else
  				  {
@@ -267,6 +276,25 @@ public class MainActivity extends FragmentActivity {
 	            Context.MODE_PRIVATE);
 	}
 	
+	public String retrieveSavedGuestName()
+	{
+		Log.d("retrieveSavedGuestName()", "Attempting to retrieve saved guest name");
+		String guestName = null;
+		final SharedPreferences prefs = getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
+		String registrationGuest = prefs.getString("PROPERTY_GUESTNAME", "");
+		if (registrationGuest.isEmpty()) {
+		    	Log.i("LOUD AND CLEAR", "No previous guest name registered.");
+		    	guestName = "Name";
+		    	Log.d("retrieveSavedGuestName()", "guest name registratedGuest is empty guestname is now" + guestName);
+			}
+		else{ 
+			guestName = registrationGuest;
+		Log.d("retrieveSavedGuestName()", "guestname is found, guestname is " + guestName);
+		}
+
+		return guestName;
+	}
+	
 	private void initializeUserID(Context context){
 		final SharedPreferences prefs = getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
 		String registrationId = prefs.getString("PROPERTY_UID", "");
@@ -284,6 +312,38 @@ public class MainActivity extends FragmentActivity {
 		    SharedPreferences.Editor editor = prefs.edit();
 		    editor.putString("PROPERTY_UID", Self.getUser().getuID());
 		    editor.commit();  
+	}
+	
+	public void handleNewGuest(String username)
+	{
+		final SharedPreferences prefs = getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE);
+		String registrationId = prefs.getString("PROPERTY_UID", "");
+		if (registrationId.isEmpty()) {
+		    	Log.i("LOUD AND CLEAR", "Registration not found.");
+		    	registrationId = UUID.randomUUID().toString();
+			}
+    	Self.getUser().setName(registrationId);
+
+    	if (username.equals("Name") || (username.trim().length() == 0) ){
+    		username = "";
+    	}
+    
+    	String processedUsername = "Guest-" + registrationId.substring(registrationId.length()-6, registrationId.length()-1) + " (" + username + ")";
+    	
+    	Self.getUser().setName(processedUsername);
+		Log.d("LOUD AND CLEAR", "Accepting guest login with username: " + processedUsername);
+     
+		Log.d("LOUD AND CLEAR", "Guest Login accepted and storing name " + Self.getUser().getName());
+		storeGuestName(username);
+		//Store UID info
+    	
+	}
+	private void storeGuestName(String guestName){
+		final SharedPreferences prefs = getGCMPreferences();
+		    Log.i("storeGuestName", "Saving guestName on app version " + guestName);
+		    SharedPreferences.Editor editor = prefs.edit();
+		    editor.putString("PROPERTY_GUESTNAME", guestName);
+		    editor.commit();
 	}
 	
 	/*Check for network*/
