@@ -219,6 +219,29 @@ public class MainActivity extends FragmentActivity {
  				  transaction.commit();
 			}	
 		}
+		else if(fragment_id.equals(Constants.LOGIN_FRAGMENT_ID)){
+			if(this.loginFragment == null)
+				this.loginFragment = new LoginFragment();
+			if(this.fm != null)
+			{
+				 FragmentTransaction transaction = fm.beginTransaction();
+ 				  
+ 				  transaction.setCustomAnimations(0, android.R.anim.fade_out);
+ 				  
+ 				  if(this.showingFragmentID.equals(Constants.CREATE_QUESTION_FRAGMENT_ID))
+ 				  {
+ 					  transaction.hide(this.cqFragment);
+ 					  transaction.show(this.loginFragment);
+ 				  }
+ 				  else
+ 				  {
+ 					  transaction.replace(R.id.fragment_frame, this.loginFragment, Constants.LOGIN_FRAGMENT_ID);  
+ 				  }
+ 				 this.showingFragmentID = Constants.LOGIN_FRAGMENT_ID;
+
+ 				  transaction.commit();
+			}
+		}
 	}
 	
 	@Override
